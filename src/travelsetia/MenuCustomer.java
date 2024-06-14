@@ -4,6 +4,7 @@
  */
 package travelsetia;
 
+import java.awt.Color;
 import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -265,7 +266,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         CBtiketPenumpang = new javax.swing.JComboBox<>();
         jLabel20 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
-        jLabelNama1 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
@@ -537,12 +537,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         jLabel21.setText("Maskapai");
         tfff9.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 220, 70, 40));
 
-        jLabelNama1.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
-        jLabelNama1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabelNama1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelNama1.setText("Nama Pemesan");
-        tfff9.add(jLabelNama1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 20, 120, 40));
-
         jLabel16.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(255, 255, 255));
         jLabel16.setText("Bandara Tujuan");
@@ -560,6 +554,15 @@ public class MenuCustomer extends javax.swing.JFrame {
         jLabel22.setText("Tanggal Kedatangan");
         tfff9.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, 150, 40));
 
+        tfNamaPemesan.setText("Nama Pemesan");
+        tfNamaPemesan.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfNamaPemesanFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tfNamaPemesanFocusLost(evt);
+            }
+        });
         tfNamaPemesan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfNamaPemesanActionPerformed(evt);
@@ -846,6 +849,22 @@ public class MenuCustomer extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnRiwayatActionPerformed
 
+    private void tfNamaPemesanFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPemesanFocusGained
+        // TODO add your handling code here:
+        if (tfNamaPemesan.getText().equals("Nama Pemesan")) {
+            tfNamaPemesan.setText("");
+            tfNamaPemesan.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPemesanFocusGained
+
+    private void tfNamaPemesanFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPemesanFocusLost
+        // TODO add your handling code here:
+        if (tfNamaPemesan.getText().equals("")) {
+            tfNamaPemesan.setText("Nama Pemesan");
+            tfNamaPemesan.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPemesanFocusLost
+
     /**
      * @param args the command line arguments
      */
@@ -916,7 +935,6 @@ public class MenuCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JLabel jLabelNama1;
     private javax.swing.JButton jLogout;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

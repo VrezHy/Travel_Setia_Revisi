@@ -78,6 +78,7 @@ public class MenuRiwayat extends javax.swing.JFrame {
         minimize.setForeground(new java.awt.Color(255, 255, 255));
         minimize.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         minimize.setText("-");
+        minimize.setToolTipText("");
         minimize.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 minimizeMouseClicked(evt);
@@ -89,6 +90,7 @@ public class MenuRiwayat extends javax.swing.JFrame {
         exit.setForeground(new java.awt.Color(255, 255, 255));
         exit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         exit.setText("x");
+        exit.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         exit.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 exitMouseClicked(evt);
@@ -123,10 +125,10 @@ public class MenuRiwayat extends javax.swing.JFrame {
 
     private void btnKembaliRiwayatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKembaliRiwayatActionPerformed
         // TODO add your handling code here:
-        MenuCustomer customerFrame = new MenuCustomer();
-        customerFrame.setVisible(true);
-        customerFrame.pack();
-        customerFrame.setLocationRelativeTo(null);
+        MenuPesan pesanFrame = new MenuPesan();
+        pesanFrame.setVisible(true);
+        pesanFrame.pack();
+        pesanFrame.setLocationRelativeTo(null);
         this.dispose();
     }//GEN-LAST:event_btnKembaliRiwayatActionPerformed
 

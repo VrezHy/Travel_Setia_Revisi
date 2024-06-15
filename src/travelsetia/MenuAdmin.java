@@ -99,7 +99,7 @@ public class MenuAdmin extends javax.swing.JFrame {
         iconMember.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iconMember.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
 
-        JLMember.setText("Penumpang");
+        JLMember.setText("Akun Custumer");
         JLMember.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 JLMemberMouseClicked(evt);

@@ -277,7 +277,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         tfMaskapai = new javax.swing.JTextField();
         tfKursiTersedia = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
-        btnRiwayat = new javax.swing.JToggleButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTablePesawat = new javax.swing.JTable();
         txtCariPenerbangan = new javax.swing.JTextField();
@@ -469,9 +468,9 @@ public class MenuCustomer extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel1.setText("Status Kursi");
-        tfff9.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, 90, 40));
+        tfff9.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 260, 140, 30));
 
         btnPesan.setText("Pesan Sekarang");
         btnPesan.addActionListener(new java.awt.event.ActionListener() {
@@ -499,7 +498,7 @@ public class MenuCustomer extends javax.swing.JFrame {
                 tfStatusKursiActionPerformed(evt);
             }
         });
-        tfff9.add(tfStatusKursi, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 300, 370, 30));
+        tfff9.add(tfStatusKursi, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 260, 370, 30));
 
         jLabel3.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -508,15 +507,15 @@ public class MenuCustomer extends javax.swing.JFrame {
 
         jLabel17.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel17.setText("Bandara Asal");
-        tfff9.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 110, 40));
+        tfff9.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 26, 140, 20));
 
         jLabel19.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel19.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel19.setText("Tanggal Keberangkatan");
-        tfff9.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 140, 180, 40));
+        tfff9.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 170, 30));
 
         CBtiketPenumpang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
         CBtiketPenumpang.addActionListener(new java.awt.event.ActionListener() {
@@ -533,26 +532,27 @@ public class MenuCustomer extends javax.swing.JFrame {
 
         jLabel21.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel21.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel21.setText("Maskapai");
-        tfff9.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 220, 70, 40));
+        tfff9.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 180, 120, 30));
 
         jLabel16.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel16.setText("Bandara Tujuan");
-        tfff9.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 110, -1, -1));
+        tfff9.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, 140, 30));
 
         jLabel18.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel18.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel18.setText("Kursi Tersedia");
-        tfff9.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 260, 120, 40));
+        tfff9.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 150, 30));
 
         jLabel22.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel22.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel22.setText("Tanggal Kedatangan");
-        tfff9.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, 150, 40));
+        tfff9.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 180, 30));
 
         tfNamaPemesan.setText("Nama Pemesan");
         tfNamaPemesan.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -568,49 +568,49 @@ public class MenuCustomer extends javax.swing.JFrame {
                 tfNamaPemesanActionPerformed(evt);
             }
         });
-        tfff9.add(tfNamaPemesan, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, 370, 30));
+        tfff9.add(tfNamaPemesan, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 90, 280, 50));
 
         tfBandaraAsal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfBandaraAsalActionPerformed(evt);
             }
         });
-        tfff9.add(tfBandaraAsal, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 60, 370, 30));
+        tfff9.add(tfBandaraAsal, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, 370, 30));
 
         tfBandaraTujuan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfBandaraTujuanActionPerformed(evt);
             }
         });
-        tfff9.add(tfBandaraTujuan, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 100, 370, 30));
+        tfff9.add(tfBandaraTujuan, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 60, 370, 30));
 
         tfTanggalKeberangkatan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfTanggalKeberangkatanActionPerformed(evt);
             }
         });
-        tfff9.add(tfTanggalKeberangkatan, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 370, 30));
+        tfff9.add(tfTanggalKeberangkatan, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 100, 370, 30));
 
         tfTanggalKedatangan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfTanggalKedatanganActionPerformed(evt);
             }
         });
-        tfff9.add(tfTanggalKedatangan, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 220, 370, 30));
+        tfff9.add(tfTanggalKedatangan, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 180, 370, 30));
 
         tfMaskapai.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfMaskapaiActionPerformed(evt);
             }
         });
-        tfff9.add(tfMaskapai, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 180, 370, 30));
+        tfff9.add(tfMaskapai, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 370, 30));
 
         tfKursiTersedia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfKursiTersediaActionPerformed(evt);
             }
         });
-        tfff9.add(tfKursiTersedia, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 260, 370, 30));
+        tfff9.add(tfKursiTersedia, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 220, 370, 30));
 
         jPanel5.add(tfff9, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 220, 990, 360));
 
@@ -618,14 +618,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel14.setText("_________________________________________________________");
         jPanel5.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 40, 280, -1));
-
-        btnRiwayat.setText("Riwayat");
-        btnRiwayat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRiwayatActionPerformed(evt);
-            }
-        });
-        jPanel5.add(btnRiwayat, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 540, 90, 40));
 
         jTablePesawat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -644,6 +636,12 @@ public class MenuCustomer extends javax.swing.JFrame {
             }
         });
         jScrollPane3.setViewportView(jTablePesawat);
+        if (jTablePesawat.getColumnModel().getColumnCount() > 0) {
+            jTablePesawat.getColumnModel().getColumn(1).setHeaderValue("Lokasi Keberangkatan");
+            jTablePesawat.getColumnModel().getColumn(2).setHeaderValue("Destinasi");
+            jTablePesawat.getColumnModel().getColumn(3).setHeaderValue("Tanggal Keberangkatan");
+            jTablePesawat.getColumnModel().getColumn(4).setHeaderValue("Status Kursi");
+        }
 
         jPanel5.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 60, 990, 140));
 
@@ -840,15 +838,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tfKursiTersediaActionPerformed
 
-    private void btnRiwayatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRiwayatActionPerformed
-        // button riwayat
-        MenuRiwayat riwayatFrame = new MenuRiwayat();
-        riwayatFrame.setVisible(true);
-        riwayatFrame.pack();
-        riwayatFrame.setLocationRelativeTo(null);
-        this.dispose();
-    }//GEN-LAST:event_btnRiwayatActionPerformed
-
     private void tfNamaPemesanFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPemesanFocusGained
         // TODO add your handling code here:
         if (tfNamaPemesan.getText().equals("Nama Pemesan")) {
@@ -905,7 +894,6 @@ public class MenuCustomer extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> CBtiketPenumpang;
     private javax.swing.JButton btnCetakPembayaran;
     private javax.swing.JButton btnPesan;
-    private javax.swing.JToggleButton btnRiwayat;
     private javax.swing.JLabel exit;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

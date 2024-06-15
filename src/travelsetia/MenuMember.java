@@ -121,7 +121,6 @@ public class MenuMember extends javax.swing.JPanel {
         tabelPenumpang = new javax.swing.JTable();
         iconMember = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jButton6 = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(53, 114, 239));
         setPreferredSize(new java.awt.Dimension(928, 599));
@@ -145,39 +144,21 @@ public class MenuMember extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(tabelPenumpang);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 130, 760, 430));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 760, 490));
 
         iconMember.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iconMember.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
-        add(iconMember, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 30, 40, 30));
+        add(iconMember, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 40, 30));
 
         jLabel3.setFont(new java.awt.Font("Verdana", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Master Data > Akun Penumpang");
         add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 0, 260, 30));
-
-        jButton6.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
-        jButton6.setForeground(new java.awt.Color(102, 153, 255));
-        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/Minus.png"))); // NOI18N
-        jButton6.setText("Hapus");
-        jButton6.setBorder(null);
-        jButton6.setPreferredSize(new java.awt.Dimension(78, 25));
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-        add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 70, 140, 50));
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        deleteSelectedRow();
-    }//GEN-LAST:event_jButton6ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel iconMember;
-    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;

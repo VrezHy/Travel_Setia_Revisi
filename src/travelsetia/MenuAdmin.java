@@ -33,10 +33,10 @@ public class MenuAdmin extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        PmainMember = new javax.swing.JPanel();
-        PgarisMember = new javax.swing.JPanel();
-        iconMember = new javax.swing.JLabel();
-        JLMember = new javax.swing.JLabel();
+        PmainAkun = new javax.swing.JPanel();
+        PgarisAkun = new javax.swing.JPanel();
+        iconAkun = new javax.swing.JLabel();
+        JLAkunCustomer = new javax.swing.JLabel();
         PmainPesawat = new javax.swing.JPanel();
         PgarisPesawat = new javax.swing.JPanel();
         iconPesawat = new javax.swing.JLabel();
@@ -46,6 +46,14 @@ public class MenuAdmin extends javax.swing.JFrame {
         JLDashboard = new javax.swing.JLabel();
         PgarisDashboard = new javax.swing.JPanel();
         jButtonBackAdmin = new javax.swing.JButton();
+        PmainRiwayat = new javax.swing.JPanel();
+        JLRiwayatPemesanan = new javax.swing.JLabel();
+        PgarisRiwayat = new javax.swing.JPanel();
+        iconRiwayat = new javax.swing.JLabel();
+        PmainPenumpang = new javax.swing.JPanel();
+        JLPenumpangBooking = new javax.swing.JLabel();
+        PgarisBooking = new javax.swing.JPanel();
+        iconBooking = new javax.swing.JLabel();
         panel_kanan = new javax.swing.JPanel();
         panel_atas = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -81,59 +89,59 @@ public class MenuAdmin extends javax.swing.JFrame {
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("Libraries");
 
-        PmainMember.setBackground(new java.awt.Color(255, 255, 255));
+        PmainAkun.setBackground(new java.awt.Color(255, 255, 255));
 
-        PgarisMember.setBackground(new java.awt.Color(255, 255, 255));
+        PgarisAkun.setBackground(new java.awt.Color(255, 255, 255));
 
-        javax.swing.GroupLayout PgarisMemberLayout = new javax.swing.GroupLayout(PgarisMember);
-        PgarisMember.setLayout(PgarisMemberLayout);
-        PgarisMemberLayout.setHorizontalGroup(
-            PgarisMemberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout PgarisAkunLayout = new javax.swing.GroupLayout(PgarisAkun);
+        PgarisAkun.setLayout(PgarisAkunLayout);
+        PgarisAkunLayout.setHorizontalGroup(
+            PgarisAkunLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 14, Short.MAX_VALUE)
         );
-        PgarisMemberLayout.setVerticalGroup(
-            PgarisMemberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        PgarisAkunLayout.setVerticalGroup(
+            PgarisAkunLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        iconMember.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        iconMember.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
+        iconAkun.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        iconAkun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
 
-        JLMember.setText("Akun Custumer");
-        JLMember.addMouseListener(new java.awt.event.MouseAdapter() {
+        JLAkunCustomer.setText("Akun custumer");
+        JLAkunCustomer.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                JLMemberMouseClicked(evt);
+                JLAkunCustomerMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                JLMemberMouseEntered(evt);
+                JLAkunCustomerMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                JLMemberMouseExited(evt);
+                JLAkunCustomerMouseExited(evt);
             }
         });
 
-        javax.swing.GroupLayout PmainMemberLayout = new javax.swing.GroupLayout(PmainMember);
-        PmainMember.setLayout(PmainMemberLayout);
-        PmainMemberLayout.setHorizontalGroup(
-            PmainMemberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PmainMemberLayout.createSequentialGroup()
+        javax.swing.GroupLayout PmainAkunLayout = new javax.swing.GroupLayout(PmainAkun);
+        PmainAkun.setLayout(PmainAkunLayout);
+        PmainAkunLayout.setHorizontalGroup(
+            PmainAkunLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PmainAkunLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(PgarisMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(PgarisAkun, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(iconMember, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(iconAkun, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(JLMember, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(JLAkunCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        PmainMemberLayout.setVerticalGroup(
-            PmainMemberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PmainMemberLayout.createSequentialGroup()
+        PmainAkunLayout.setVerticalGroup(
+            PmainAkunLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PmainAkunLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(PmainMemberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(PgarisMember, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(iconMember, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE))
+                .addGroup(PmainAkunLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(PgarisAkun, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(iconAkun, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE))
                 .addContainerGap())
-            .addComponent(JLMember, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(JLAkunCustomer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         PmainPesawat.setBackground(new java.awt.Color(255, 255, 255));
@@ -259,6 +267,118 @@ public class MenuAdmin extends javax.swing.JFrame {
             }
         });
 
+        PmainRiwayat.setBackground(new java.awt.Color(255, 255, 255));
+        PmainRiwayat.setPreferredSize(new java.awt.Dimension(253, 48));
+
+        JLRiwayatPemesanan.setText("Riwayat pemesanan");
+        JLRiwayatPemesanan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JLRiwayatPemesananMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                JLRiwayatPemesananMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                JLRiwayatPemesananMouseExited(evt);
+            }
+        });
+
+        PgarisRiwayat.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout PgarisRiwayatLayout = new javax.swing.GroupLayout(PgarisRiwayat);
+        PgarisRiwayat.setLayout(PgarisRiwayatLayout);
+        PgarisRiwayatLayout.setHorizontalGroup(
+            PgarisRiwayatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 14, Short.MAX_VALUE)
+        );
+        PgarisRiwayatLayout.setVerticalGroup(
+            PgarisRiwayatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        iconRiwayat.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        iconRiwayat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
+
+        javax.swing.GroupLayout PmainRiwayatLayout = new javax.swing.GroupLayout(PmainRiwayat);
+        PmainRiwayat.setLayout(PmainRiwayatLayout);
+        PmainRiwayatLayout.setHorizontalGroup(
+            PmainRiwayatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PmainRiwayatLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(PgarisRiwayat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(iconRiwayat, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(JLRiwayatPemesanan, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        PmainRiwayatLayout.setVerticalGroup(
+            PmainRiwayatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(JLRiwayatPemesanan, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PmainRiwayatLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PmainRiwayatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(iconRiwayat, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                    .addComponent(PgarisRiwayat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        PmainPenumpang.setBackground(new java.awt.Color(255, 255, 255));
+        PmainPenumpang.setPreferredSize(new java.awt.Dimension(253, 48));
+
+        JLPenumpangBooking.setText("Penumpang per booking");
+        JLPenumpangBooking.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JLPenumpangBookingMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                JLPenumpangBookingMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                JLPenumpangBookingMouseExited(evt);
+            }
+        });
+
+        PgarisBooking.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout PgarisBookingLayout = new javax.swing.GroupLayout(PgarisBooking);
+        PgarisBooking.setLayout(PgarisBookingLayout);
+        PgarisBookingLayout.setHorizontalGroup(
+            PgarisBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 14, Short.MAX_VALUE)
+        );
+        PgarisBookingLayout.setVerticalGroup(
+            PgarisBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        iconBooking.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        iconBooking.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
+
+        javax.swing.GroupLayout PmainPenumpangLayout = new javax.swing.GroupLayout(PmainPenumpang);
+        PmainPenumpang.setLayout(PmainPenumpangLayout);
+        PmainPenumpangLayout.setHorizontalGroup(
+            PmainPenumpangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PmainPenumpangLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(PgarisBooking, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(iconBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(JLPenumpangBooking, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        PmainPenumpangLayout.setVerticalGroup(
+            PmainPenumpangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PmainPenumpangLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PmainPenumpangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(iconBooking, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                    .addComponent(PgarisBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addComponent(JLPenumpangBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout PAdminLayout = new javax.swing.GroupLayout(PAdmin);
         PAdmin.setLayout(PAdminLayout);
         PAdminLayout.setHorizontalGroup(
@@ -266,8 +386,10 @@ public class MenuAdmin extends javax.swing.JFrame {
             .addGroup(PAdminLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(PAdminLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(PmainPenumpang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(PmainRiwayat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonBackAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(PmainMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(PmainAkun, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(PmainPesawat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(PAdminLayout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -296,8 +418,12 @@ public class MenuAdmin extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(PmainPesawat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(PmainMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 428, Short.MAX_VALUE)
+                .addComponent(PmainAkun, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(PmainRiwayat, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(PmainPenumpang, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 309, Short.MAX_VALUE)
                 .addComponent(jButtonBackAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24))
         );
@@ -430,28 +556,28 @@ public class MenuAdmin extends javax.swing.JFrame {
         panelTengahDashboard.revalidate();
     }//GEN-LAST:event_JLPesawatMouseClicked
 
-    private void JLMemberMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLMemberMouseExited
+    private void JLAkunCustomerMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLAkunCustomerMouseExited
         // TODO add your handling code here:
-        PmainMember.setBackground(new Color(255,255,255));
-        PgarisMember.setBackground(new Color(255,255,255));
-    }//GEN-LAST:event_JLMemberMouseExited
+        PmainAkun.setBackground(new Color(255,255,255));
+        PgarisAkun.setBackground(new Color(255,255,255));
+    }//GEN-LAST:event_JLAkunCustomerMouseExited
 
-    private void JLMemberMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLMemberMouseEntered
+    private void JLAkunCustomerMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLAkunCustomerMouseEntered
         // TODO add your handling code here:
-        PmainMember.setBackground(new Color(250,250,250));
-        PgarisMember.setBackground(new Color(102,153,255));
-    }//GEN-LAST:event_JLMemberMouseEntered
+        PmainAkun.setBackground(new Color(250,250,250));
+        PgarisAkun.setBackground(new Color(102,153,255));
+    }//GEN-LAST:event_JLAkunCustomerMouseEntered
 
-    private void JLMemberMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLMemberMouseClicked
+    private void JLAkunCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLAkunCustomerMouseClicked
         // TODO add your handling code here:
-        PmainMember.setBackground(new Color(240,240,240));
-        PgarisMember.setBackground(new Color(102,153,255));
+        PmainAkun.setBackground(new Color(240,240,240));
+        PgarisAkun.setBackground(new Color(102,153,255));
 
         panelTengahDashboard.removeAll();
         panelTengahDashboard.add(new MenuMember());
         panelTengahDashboard.repaint();
         panelTengahDashboard.revalidate();
-    }//GEN-LAST:event_JLMemberMouseClicked
+    }//GEN-LAST:event_JLAkunCustomerMouseClicked
 
     private void jButtonBackAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBackAdminActionPerformed
         // TODO add your handling code here:
@@ -464,6 +590,52 @@ public class MenuAdmin extends javax.swing.JFrame {
         Login1Frame.setLocationRelativeTo(null);
         this.dispose();
     }//GEN-LAST:event_jButtonBackAdminMouseClicked
+
+    private void JLRiwayatPemesananMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLRiwayatPemesananMouseClicked
+        // TODO add your handling code here:
+        PmainRiwayat.setBackground(new Color(240,240,240));
+        PgarisRiwayat.setBackground(new Color(102,153,255));
+
+        panelTengahDashboard.removeAll();
+        panelTengahDashboard.add(new MenuRiwayat1());
+        panelTengahDashboard.repaint();
+        panelTengahDashboard.revalidate();
+    }//GEN-LAST:event_JLRiwayatPemesananMouseClicked
+
+    private void JLRiwayatPemesananMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLRiwayatPemesananMouseEntered
+        // TODO add your handling code here:
+        PmainRiwayat.setBackground(new Color(250,250,250));
+        PgarisRiwayat.setBackground(new Color(102,153,255));
+    }//GEN-LAST:event_JLRiwayatPemesananMouseEntered
+
+    private void JLRiwayatPemesananMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLRiwayatPemesananMouseExited
+        // TODO add your handling code here:
+        PmainRiwayat.setBackground(new Color(255,255,255));
+        PgarisRiwayat.setBackground(new Color(255,255,255));
+    }//GEN-LAST:event_JLRiwayatPemesananMouseExited
+
+    private void JLPenumpangBookingMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLPenumpangBookingMouseClicked
+        // TODO add your handling code here:
+        PmainPenumpang.setBackground(new Color(240,240,240));
+        PgarisBooking.setBackground(new Color(102,153,255));
+
+        panelTengahDashboard.removeAll();
+        panelTengahDashboard.add(new MenuBooking1());
+        panelTengahDashboard.repaint();
+        panelTengahDashboard.revalidate();
+    }//GEN-LAST:event_JLPenumpangBookingMouseClicked
+
+    private void JLPenumpangBookingMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLPenumpangBookingMouseEntered
+        // TODO add your handling code here:
+        PmainPenumpang.setBackground(new Color(250,250,250));
+        PgarisBooking.setBackground(new Color(102,153,255));
+    }//GEN-LAST:event_JLPenumpangBookingMouseEntered
+
+    private void JLPenumpangBookingMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JLPenumpangBookingMouseExited
+        // TODO add your handling code here:
+        PmainPenumpang.setBackground(new Color(255,255,255));
+        PgarisBooking.setBackground(new Color(255,255,255));
+    }//GEN-LAST:event_JLPenumpangBookingMouseExited
 
     /**
      * @param args the command line arguments
@@ -501,20 +673,28 @@ public class MenuAdmin extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel JLAkunCustomer;
     private javax.swing.JLabel JLDashboard;
-    private javax.swing.JLabel JLMember;
+    private javax.swing.JLabel JLPenumpangBooking;
     private javax.swing.JLabel JLPesawat;
+    private javax.swing.JLabel JLRiwayatPemesanan;
     private javax.swing.JPanel PAdmin;
+    private javax.swing.JPanel PgarisAkun;
+    private javax.swing.JPanel PgarisBooking;
     private javax.swing.JPanel PgarisDashboard;
-    private javax.swing.JPanel PgarisMember;
     private javax.swing.JPanel PgarisPesawat;
+    private javax.swing.JPanel PgarisRiwayat;
+    private javax.swing.JPanel PmainAkun;
     private javax.swing.JPanel PmainDashboard;
-    private javax.swing.JPanel PmainMember;
+    private javax.swing.JPanel PmainPenumpang;
     private javax.swing.JPanel PmainPesawat;
+    private javax.swing.JPanel PmainRiwayat;
     private javax.swing.JLabel exit;
+    private javax.swing.JLabel iconAkun;
+    private javax.swing.JLabel iconBooking;
     private javax.swing.JLabel iconDash;
-    private javax.swing.JLabel iconMember;
     private javax.swing.JLabel iconPesawat;
+    private javax.swing.JLabel iconRiwayat;
     private javax.swing.JButton jButtonBackAdmin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;

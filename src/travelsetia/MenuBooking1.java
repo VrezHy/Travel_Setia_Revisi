@@ -4,17 +4,121 @@
  */
 package travelsetia;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author dimas
  */
 public class MenuBooking1 extends javax.swing.JPanel {
 
-    /**
-     * Creates new form MenuBooking1
-     */
+    private DefaultTableModel model = new DefaultTableModel();
+    private Connection conn;
+
     public MenuBooking1() {
         initComponents();
+        loadDataToTable();
+    }
+
+    private void loadDataToTable() {
+        conn = Koneksi.bukaKoneksi();
+        System.out.println(conn);
+        String sql = "SELECT dt.idTransaksi, dt.idBooking, dt.tanggalTransaksi, dt.jumlahPembayaran, dt.namaPenumpang FROM detail_transaksi dt JOIN booking b ON dt.idBooking = b.idBooking";
+
+        try (PreparedStatement pst = conn.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
+
+            // Inisialisasi DefaultTableModel dengan kolom yang ditentukan
+            DefaultTableModel model = new DefaultTableModel();
+            model.setColumnIdentifiers(new Object[]{
+                "ID Transaksi",
+                "ID Booking",
+                "Tanggal Booking",
+                "Jumlah Pembayaran",
+                "Nama Penumpang"
+            });
+
+            // Memproses ResultSet dan menambahkan data ke model
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("idTransaksi"),
+                    rs.getString("idBooking"),
+                    rs.getString("tanggalTransaksi"),
+                    rs.getString("jumlahPembayaran"),
+                    rs.getString("namaPenumpang")
+                });
+            }
+
+            // Set model ke JTable
+            tabelPenumpang.setModel(model);
+            tabelPenumpang.setDefaultEditor(Object.class, null); // Nonaktifkan pengeditan sel
+            tabelPenumpang.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Hanya pilih satu baris
+
+        } catch (SQLException ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
+    }
+
+    private int hitungPesawat() {
+        int totalPesawat = 0;
+        String sql = "SELECT COUNT(*) AS total FROM pesawat";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                totalPesawat = rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving total aircraft: " + e.getMessage());
+        }
+
+        return totalPesawat;
+    }
+
+    private int hitungBandara() {
+        int totalBandara = 0;
+        String sql = "SELECT COUNT(*) AS totalBandara FROM bandara";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                totalBandara = rs.getInt("totalBandara");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving total aircraft: " + e.getMessage());
+        }
+
+        return totalBandara;
+    }
+
+    private int hitungCustomer() {
+        int totalCustomer = 0;
+        String sql = "SELECT COUNT(*) AS totalCustomer FROM detail_transaksi";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                totalCustomer = rs.getInt("totalCustomer");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving total aircraft: " + e.getMessage());
+        }
+
+        return totalCustomer;
+    }
+
+    private void insertDetailBooking() {
+        String sql = "INSERT INTO detail_booking (idDetail, idBooking, idPenumpang, tanggalBooking) VALUES (?, ?, ?, ?)";
+        try {
+            Connection conn = Koneksi.bukaKoneksi();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            java.sql.Date currentDate = new java.sql.Date(System.currentTimeMillis());
+
+            pstmt.executeBatch();
+        } catch (SQLException e) {
+
+        }
     }
 
     /**

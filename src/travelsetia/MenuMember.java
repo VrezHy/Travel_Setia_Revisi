@@ -1,4 +1,4 @@
-package travelsetia;
+        package travelsetia;
 
 import javax.swing.JOptionPane;
 import java.sql.Connection;
@@ -37,74 +37,45 @@ public class MenuMember extends javax.swing.JPanel {
 
         conn = Koneksi.bukaKoneksi();
         System.out.println(conn);
-        String sql = "SELECT a.idPenumpang AS idAkun, a.email AS email_akun, a.userPassword AS userPassword_akun, p.destinasi AS destinasi_pesawat FROM akun a LEFT JOIN pesawat p ON a.idPenumpang = p.idPesawat; ";
-        try {
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
+        String sql = "SELECT email, userPassword, nomorTelepon, tglLahir, kewarganegaraan, nomorTelepon FROM akun;";
+        try (PreparedStatement pst = conn.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
 
+            // Inisialisasi DefaultTableModel dengan kolom yang ditentukan
             DefaultTableModel model = new DefaultTableModel();
-            model.setColumnIdentifiers(new Object[]{"ID Akun", "Email Pengguna", "Password Pengguna", "Destinasi", "Tiket Terbeli"});
+            model.setColumnIdentifiers(new Object[]{
+                "Email",
+                "Password",
+                "Tanggal Lahir",
+                "Kewarganegaraan",
+                "Nomor Telepon",
+               
+            });
 
+            // Memproses ResultSet dan menambahkan data ke model
             while (rs.next()) {
-               
-                int idPenumpang = rs.getInt("idAkun");
-                int tiketTerjual = hitungTiketTerjual(idPenumpang);
+                
 
-               
+
                 model.addRow(new Object[]{
-                    rs.getInt("idAkun"),
-                    rs.getString("email_akun"),
-                    rs.getString("userPassword_akun"),
-                    rs.getString("destinasi_pesawat"),
-                    tiketTerjual
-
+                    rs.getString("email"),
+                    rs.getString("userPassword"),
+                    rs.getString("tglLahir"),
+                    rs.getString("kewarganegaraan"),
+                    rs.getString("nomorTelepon"),
+                    
+               
                 });
             }
 
+            // Set the model to your JTable
             tabelPenumpang.setModel(model);
-            tabelPenumpang.setDefaultEditor(Object.class, null);
+            tabelPenumpang.setDefaultEditor(Object.class, null); // Nonaktifkan pengeditan sel
+            tabelPenumpang.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Hanya pilih satu baris
+          
 
-        } catch (Exception ex) {
-            System.out.println("Error : " + ex.getMessage());
+        } catch (SQLException ex) {
+            System.out.println("Error: " + ex.getMessage());
         }
-    }
-
-    private void deleteSelectedRow() {
-        int row = tabelPenumpang.getSelectedRow();
-        if (row != -1) {
-            DefaultTableModel model = (DefaultTableModel) tabelPenumpang.getModel();
-            int idPesawat = (int) model.getValueAt(row, 0);
-
-            // Hapus dari database
-            String sql = "DELETE FROM pesawat WHERE idPenumpang = ?";
-            try {
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.setInt(1, idPesawat);
-                pst.executeUpdate();
-                System.out.println("Row deleted successfully.");
-            } catch (Exception ex) {
-                System.out.println("Error : " + ex.getMessage());
-            }
-
-            // Hapus dari tabel
-            model.removeRow(row);
-        }
-    }
-
-    private int hitungTiketTerjual(int idPesawat) {
-        int totalTiketTerjual = 0;
-        String sql = "SELECT SUM(jumlahTiket) AS total FROM booking WHERE idPesawat = ?";
-        try {
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setInt(1, idPesawat);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                totalTiketTerjual = rs.getInt("total");
-            }
-        } catch (SQLException e) {
-            System.out.println("Error retrieving total tiket terjual: " + e.getMessage());
-        }
-        return totalTiketTerjual;
     }
 
     /**

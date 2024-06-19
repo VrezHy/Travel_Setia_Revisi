@@ -3,6 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package travelsetia;
+import java.awt.Color;
+import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableRowSorter;
+
 
 /**
  *
@@ -10,12 +23,244 @@ package travelsetia;
  */
 public class MenuPesan extends javax.swing.JFrame {
 
-    /**
-     * Creates new form MenuPesan
-     */
-    public MenuPesan() {
+    
+    
+    private Connection conn;
+     private String bandaraKeberangkatan;
+    private String bandaraTujuan;
+    private String namaPesawat;
+    private String tanggalKeberangkatan;
+    private double totalHarga;
+    private int idPenerbangan; // Ensure this is set correctly in your actual code
+    private int kursiTersedia;
+    private int jumlahTiket;
+     private int jumlahPenumpang;
+
+    public MenuPesan(String bandaraKeberangkatan, String bandaraTujuan, String namaPesawat,
+                     String tanggalKeberangkatan, double totalHarga, int jumlahTiket, int kursiTersedia, int idPenerbangan, int jumlahPenumpang)  {
         initComponents();
+        this.bandaraKeberangkatan = bandaraKeberangkatan;
+        this.bandaraTujuan = bandaraTujuan;
+        this.namaPesawat = namaPesawat;
+        this.tanggalKeberangkatan = tanggalKeberangkatan;
+        this.totalHarga = totalHarga;
+        this.kursiTersedia = kursiTersedia;
+        this.jumlahTiket = jumlahTiket;
+        this.idPenerbangan = idPenerbangan;
+        this.jumlahPenumpang = jumlahPenumpang;
+        
+        // Set idPenerbangan accordingly if needed
+        
+        
+        conn = Koneksi.bukaKoneksi();
+        // Example usage to display data in labels
+        
+        labelTiket.setText("Total Tiket: " + getTiketTersedia(idPenerbangan));
+        setupTextFieldBasedOnPassengerCount();
     }
+    
+    
+        
+
+    private void prosesBooking() {
+        
+        if (kursiTersedia >= jumlahTiket) {
+            int kursiBaru = kursiTersedia - jumlahTiket;
+            updateKursiTersedia(idPenerbangan, kursiBaru);
+            JOptionPane.showMessageDialog(this, "Booking berhasil!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Maaf, kursi untuk penerbangan ini sudah habis.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
+        insertDetailBooking();
+        saveNamesToDatabase();
+        Koneksi.tutupKoneksi();
+    }
+    
+    private void insertDetailBooking() {
+        String sql = "INSERT INTO detail_booking (idDetail, idBooking, idPenumpang, tanggalBooking) VALUES (?, ?, ?, ?)";
+        try  {
+            Connection conn = Koneksi.bukaKoneksi(); 
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            java.sql.Date currentDate = new java.sql.Date(System.currentTimeMillis());
+
+            int idDetail = generateIdDetail(); // Implement this method to generate a unique idDetail
+            int idBooking = generateIdBooking(); // Implement this method to generate a unique idBooking
+            int idPenumpang = generateIdPenumpang(); // Implement this method to generate a unique idPenumpang
+
+            // Assuming you have a method to get passenger names based on the number of tickets
+            if (jumlahPenumpang >= 1) {
+                pstmt.setInt(1, idDetail);
+                pstmt.setInt(2, idBooking);
+                pstmt.setInt(3, idPenumpang);
+                pstmt.setDate(4, currentDate);
+                pstmt.addBatch();
+                idDetail++;
+                idBooking++;
+                idPenumpang++;
+            }
+            if (jumlahPenumpang >= 2) {
+                pstmt.setInt(1, idDetail);
+                pstmt.setInt(2, idBooking);
+                pstmt.setInt(3, idPenumpang);
+                pstmt.setDate(4, currentDate);
+                pstmt.addBatch();
+                idDetail++;
+                idBooking++;
+                idPenumpang++;
+            }
+            if (jumlahPenumpang >= 3) {
+                pstmt.setInt(1, idDetail);
+                pstmt.setInt(2, idBooking);
+                pstmt.setInt(3, idPenumpang);
+                pstmt.setDate(4, currentDate);
+                pstmt.addBatch();
+                idDetail++;
+                idBooking++;
+                idPenumpang++;
+            }
+
+            pstmt.executeBatch();
+        } catch (SQLException e){
+            
+        }
+    } 
+
+    private int generateIdDetail() {
+        return 1; 
+    }
+
+    private int generateIdBooking() {
+        return 1; 
+    }
+
+    private int generateIdPenumpang() {
+        return 1; 
+    }
+
+
+    private void updateKursiTersedia(int idPenerbangan, int kursiTersedia) {
+        if (conn != null){
+             String sqlUpdate = "UPDATE kapasitas_kursi SET kursiTersedia = ? WHERE idPenerbangan = ?";
+        try {
+            PreparedStatement pst = conn.prepareStatement(sqlUpdate);
+            pst.setInt(1, kursiTersedia);
+            pst.setInt(2, idPenerbangan);
+            pst.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating available seats: " + e.getMessage());
+        }
+        }
+
+    }
+    
+    private int getTiketTersedia(int idPenerbangan) {
+    int tiketTersedia = 0;
+    String sql = "SELECT tiketTersedia FROM ketersediaan_tiket WHERE idPenerbangan = ?";
+
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setInt(1, idPenerbangan);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+            tiketTersedia = rs.getInt("tiketTersedia");
+        }
+    } catch (SQLException e) {
+        System.out.println("Error retrieving available tickets: " + e.getMessage());
+    }
+
+    return tiketTersedia;
+    
+    
+}
+    
+    
+    
+    private void setupTextFieldBasedOnPassengerCount() {
+        // Sembunyikan semua text field terlebih dahulu
+        panelPenumpang.setVisible(false);
+        panelPenumpang2.setVisible(false);
+        panelPenumpang3.setVisible(false);
+        panelPenumpang4.setVisible(false);
+        
+        // Tampilkan text field sesuai dengan jumlah penumpang yang dipilih
+        if (jumlahPenumpang >= 1) {
+            panelPenumpang.setVisible(true);
+        }
+        if (jumlahPenumpang >= 2) {
+            panelPenumpang2.setVisible(true);
+        }
+        if (jumlahPenumpang >= 3) {
+            panelPenumpang3.setVisible(true);
+        }
+        if (jumlahPenumpang >= 4) {
+            panelPenumpang4.setVisible(true);
+        }
+    }
+    
+ private void saveNamesToDatabase() {
+        int idBooking = generateIdBookingTransaksi();
+        try (Connection conn = Koneksi.bukaKoneksi()) {
+            // Insert names into database for each passenger
+            if (jumlahPenumpang >= 1) {
+                saveNameToDatabase(tfNamaPenumpang1.getText(), conn, idBooking);
+            }
+            if (jumlahPenumpang >= 2) {
+                saveNameToDatabase(tfNamaPenumpang2.getText(), conn, idBooking);
+            }
+            if (jumlahPenumpang >= 3) {
+                saveNameToDatabase(tfNamaPenumpang3.getText(), conn, idBooking) ;
+            }
+            if (jumlahPenumpang >= 4) {
+                saveNameToDatabase(tfNamaPenumpang4.getText(), conn, idBooking);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: Gagal menyimpan nama penumpang ke database.");
+            e.printStackTrace();
+        }
+    }
+ 
+ private int generateIdBookingTransaksi() {
+        int newIdBooking = 0;
+        String sql = "SELECT MAX(idBooking) AS maxId FROM detail_transaksi";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                newIdBooking = rs.getInt("maxId") + 1;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error generating new idBooking: " + e.getMessage());
+        }
+        return newIdBooking;
+    }
+
+    
+    private void saveNameToDatabase(String namaPenumpang, Connection conn, int idBooking) throws SQLException {
+        String sql = "INSERT INTO detail_transaksi (tanggalTransaksi, jumlahPembayaran, namaPenumpang, idPenerbangan, idBooking ) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Assuming you want to set the current date
+        pstmt.setDouble(2, totalHarga); // Assuming this is the total payment amount
+        pstmt.setString(3, namaPenumpang);
+        pstmt.setInt(4, idPenerbangan);
+        pstmt.setInt(5, idBooking);
+        pstmt.executeUpdate();  
+        }
+    }
+    
+    private void cetakTiket(){
+        if(jumlahTiket > 0){
+         String message = String.format(
+                        "Jumlah Tiket: %s\nTotal Harga: %s\nMaskapai: %s\nKota Keberangkatan: %s\nDestinasi: %s\nTanggal Berangkat: %s\n",
+                        jumlahTiket, totalHarga, namaPesawat, bandaraKeberangkatan, bandaraTujuan, tanggalKeberangkatan
+                );
+         JOptionPane.showMessageDialog(this, message, "Rincian Pembayaran", JOptionPane.INFORMATION_MESSAGE);
+    } else{
+            JOptionPane.showMessageDialog(this, "Maaf, TIket untuk penerbangan ini sudah habis.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+    
+    
+    
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -34,34 +279,26 @@ public class MenuPesan extends javax.swing.JFrame {
         PanelKursi = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jLabel16 = new javax.swing.JLabel();
-        labelUpdateKursi = new javax.swing.JLabel();
+        labelTiket = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        panelPenumpang = new javax.swing.JPanel();
+        tfNamaPenumpang1 = new javax.swing.JTextField();
         iconMember1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField6 = new javax.swing.JTextField();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        panelPenumpang2 = new javax.swing.JPanel();
+        tfNamaPenumpang2 = new javax.swing.JTextField();
         iconMember2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField7 = new javax.swing.JTextField();
-        jComboBox3 = new javax.swing.JComboBox<>();
+        panelPenumpang3 = new javax.swing.JPanel();
+        tfNamaPenumpang3 = new javax.swing.JTextField();
         iconMember3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jTextField4 = new javax.swing.JTextField();
-        jTextField8 = new javax.swing.JTextField();
-        jComboBox4 = new javax.swing.JComboBox<>();
+        panelPenumpang4 = new javax.swing.JPanel();
+        tfNamaPenumpang4 = new javax.swing.JTextField();
         iconMember = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        btnRiwayat = new javax.swing.JButton();
-        jToggleButton1 = new javax.swing.JToggleButton();
+        btnCetakTiket = new javax.swing.JButton();
+        buttonBayar = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -131,11 +368,11 @@ public class MenuPesan extends javax.swing.JFrame {
                 .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        labelUpdateKursi.setBackground(new java.awt.Color(255, 255, 255));
-        labelUpdateKursi.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
-        labelUpdateKursi.setForeground(new java.awt.Color(51, 153, 255));
-        labelUpdateKursi.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        labelUpdateKursi.setText("9999");
+        labelTiket.setBackground(new java.awt.Color(255, 255, 255));
+        labelTiket.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
+        labelTiket.setForeground(new java.awt.Color(51, 153, 255));
+        labelTiket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        labelTiket.setText("9999");
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/Ticket.png"))); // NOI18N
 
@@ -144,7 +381,7 @@ public class MenuPesan extends javax.swing.JFrame {
         PanelKursiLayout.setHorizontalGroup(
             PanelKursiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(labelUpdateKursi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(labelTiket, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(PanelKursiLayout.createSequentialGroup()
                 .addGap(59, 59, 59)
                 .addComponent(jLabel9)
@@ -157,22 +394,25 @@ public class MenuPesan extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelUpdateKursi, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(labelTiket, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
         jPanel1.add(PanelKursi, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 100, 150, 130));
 
-        jTextField1.setText("Nama Penumpang");
-
-        jTextField5.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jTextField5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField5.setText("Sapaan");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        tfNamaPenumpang1.setForeground(new java.awt.Color(153, 153, 153));
+        tfNamaPenumpang1.setText("Nama Penumpang");
+        tfNamaPenumpang1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang1FocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang1FocusLost(evt);
+            }
+        });
+        tfNamaPenumpang1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                tfNamaPenumpang1ActionPerformed(evt);
             }
         });
 
@@ -183,47 +423,43 @@ public class MenuPesan extends javax.swing.JFrame {
         jLabel3.setForeground(new java.awt.Color(0, 153, 255));
         jLabel3.setText("Data Penumpang 1");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelPenumpangLayout = new javax.swing.GroupLayout(panelPenumpang);
+        panelPenumpang.setLayout(panelPenumpangLayout);
+        panelPenumpangLayout.setHorizontalGroup(
+            panelPenumpangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpangLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelPenumpangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGroup(panelPenumpangLayout.createSequentialGroup()
                         .addComponent(iconMember1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(87, Short.MAX_VALUE))
+                        .addComponent(tfNamaPenumpang1, javax.swing.GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        panelPenumpangLayout.setVerticalGroup(
+            panelPenumpangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpangLayout.createSequentialGroup()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelPenumpangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(iconMember1)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(tfNamaPenumpang1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, 510, 60));
+        jPanel1.add(panelPenumpang, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, 510, 60));
 
-        jTextField2.setText("Nama Penumpang");
-
-        jTextField6.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jTextField6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField6.setText("Sapaan");
-
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        tfNamaPenumpang2.setForeground(new java.awt.Color(153, 153, 153));
+        tfNamaPenumpang2.setText("Nama Penumpang");
+        tfNamaPenumpang2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang2FocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang2FocusLost(evt);
+            }
+        });
 
         iconMember2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iconMember2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
@@ -232,45 +468,48 @@ public class MenuPesan extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(0, 153, 255));
         jLabel4.setText("Data Penumpang 2");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelPenumpang2Layout = new javax.swing.GroupLayout(panelPenumpang2);
+        panelPenumpang2.setLayout(panelPenumpang2Layout);
+        panelPenumpang2Layout.setHorizontalGroup(
+            panelPenumpang2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpang2Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelPenumpang2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(panelPenumpang2Layout.createSequentialGroup()
                         .addComponent(iconMember2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(87, Short.MAX_VALUE))
+                        .addComponent(tfNamaPenumpang2, javax.swing.GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        panelPenumpang2Layout.setVerticalGroup(
+            panelPenumpang2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpang2Layout.createSequentialGroup()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelPenumpang2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(iconMember2)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(tfNamaPenumpang2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 190, 510, 60));
+        jPanel1.add(panelPenumpang2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 190, 510, 60));
 
-        jTextField3.setText("Nama Penumpang");
-
-        jTextField7.setText("Sapaan");
-
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        tfNamaPenumpang3.setForeground(new java.awt.Color(153, 153, 153));
+        tfNamaPenumpang3.setText("Nama Penumpang");
+        tfNamaPenumpang3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang3FocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang3FocusLost(evt);
+            }
+        });
+        tfNamaPenumpang3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfNamaPenumpang3ActionPerformed(evt);
+            }
+        });
 
         iconMember3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iconMember3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
@@ -279,47 +518,46 @@ public class MenuPesan extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(0, 153, 255));
         jLabel5.setText("Data Penumpang 3");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelPenumpang3Layout = new javax.swing.GroupLayout(panelPenumpang3);
+        panelPenumpang3.setLayout(panelPenumpang3Layout);
+        panelPenumpang3Layout.setHorizontalGroup(
+            panelPenumpang3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpang3Layout.createSequentialGroup()
+                .addGroup(panelPenumpang3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelPenumpang3Layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(iconMember3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(tfNamaPenumpang3, javax.swing.GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE))
+                    .addGroup(panelPenumpang3Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(87, Short.MAX_VALUE))
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        panelPenumpang3Layout.setVerticalGroup(
+            panelPenumpang3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpang3Layout.createSequentialGroup()
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelPenumpang3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(iconMember3)
-                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(tfNamaPenumpang3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 280, 510, 60));
+        jPanel1.add(panelPenumpang3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 280, 510, 60));
 
-        jTextField4.setText("Nama Penumpang");
-
-        jTextField8.setText("Sapaan");
-
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        tfNamaPenumpang4.setForeground(new java.awt.Color(153, 153, 153));
+        tfNamaPenumpang4.setText("Nama Penumpang");
+        tfNamaPenumpang4.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang4FocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tfNamaPenumpang4FocusLost(evt);
+            }
+        });
 
         iconMember.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iconMember.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image_icon/People.png"))); // NOI18N
@@ -328,50 +566,48 @@ public class MenuPesan extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(0, 153, 255));
         jLabel1.setText("Data Penumpang 4");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelPenumpang4Layout = new javax.swing.GroupLayout(panelPenumpang4);
+        panelPenumpang4.setLayout(panelPenumpang4Layout);
+        panelPenumpang4Layout.setHorizontalGroup(
+            panelPenumpang4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpang4Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelPenumpang4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                    .addGroup(panelPenumpang4Layout.createSequentialGroup()
                         .addComponent(iconMember, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(87, Short.MAX_VALUE))
+                        .addComponent(tfNamaPenumpang4, javax.swing.GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        panelPenumpang4Layout.setVerticalGroup(
+            panelPenumpang4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPenumpang4Layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelPenumpang4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(iconMember)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(tfNamaPenumpang4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 370, 510, 60));
+        jPanel1.add(panelPenumpang4, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 370, 510, 60));
 
-        btnRiwayat.setText("Riwayat Booking");
-        btnRiwayat.addActionListener(new java.awt.event.ActionListener() {
+        btnCetakTiket.setText("Cetak TIket");
+        btnCetakTiket.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRiwayatActionPerformed(evt);
+                btnCetakTiketActionPerformed(evt);
             }
         });
-        jPanel1.add(btnRiwayat, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 400, 150, 30));
+        jPanel1.add(btnCetakTiket, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 400, 150, 30));
 
-        jToggleButton1.setText("Bayar");
-        jPanel1.add(jToggleButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 360, 150, 30));
+        buttonBayar.setText("Bayar");
+        buttonBayar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonBayarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(buttonBayar, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 360, 150, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -407,18 +643,79 @@ public class MenuPesan extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_exitMouseClicked
 
-    private void btnRiwayatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRiwayatActionPerformed
-        // TODO add your handling code here:
-        MenuCustomer cutomerFrame = new MenuCustomer();
-        cutomerFrame.setVisible(true);
-        cutomerFrame.pack();
-        cutomerFrame.setLocationRelativeTo(null);
-        this.dispose();
-    }//GEN-LAST:event_btnRiwayatActionPerformed
+    private void buttonBayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonBayarActionPerformed
+       prosesBooking();
+    }//GEN-LAST:event_buttonBayarActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void tfNamaPenumpang1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaPenumpang1ActionPerformed
+        
+    }//GEN-LAST:event_tfNamaPenumpang1ActionPerformed
+
+    private void tfNamaPenumpang1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang1FocusGained
+        if (tfNamaPenumpang1.getText().equals("Nama Penumpang")) {
+            tfNamaPenumpang1.setText("");
+            tfNamaPenumpang1.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang1FocusGained
+
+    private void tfNamaPenumpang1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang1FocusLost
+        if (tfNamaPenumpang1.getText().equals("")) {
+            tfNamaPenumpang1.setText("Nama Penumpang");
+            tfNamaPenumpang1.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang1FocusLost
+
+    private void tfNamaPenumpang2FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang2FocusGained
+        if (tfNamaPenumpang2.getText().equals("Nama Penumpang")) {
+            tfNamaPenumpang2.setText("");
+            tfNamaPenumpang2.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang2FocusGained
+
+    private void tfNamaPenumpang2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang2FocusLost
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        if (tfNamaPenumpang2.getText().equals("")) {
+            tfNamaPenumpang2.setText("Nama Penumpang");
+            tfNamaPenumpang2.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang2FocusLost
+
+    private void tfNamaPenumpang3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaPenumpang3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfNamaPenumpang3ActionPerformed
+
+    private void tfNamaPenumpang3FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang3FocusGained
+        if (tfNamaPenumpang3.getText().equals("Nama Penumpang")) {
+            tfNamaPenumpang3.setText("");
+            tfNamaPenumpang3.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang3FocusGained
+
+    private void tfNamaPenumpang3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang3FocusLost
+       if (tfNamaPenumpang3.getText().equals("")) {
+            tfNamaPenumpang3.setText("Nama Penumpang");
+            tfNamaPenumpang3.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang3FocusLost
+
+    private void tfNamaPenumpang4FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang4FocusGained
+        if (tfNamaPenumpang4.getText().equals("Nama Penumpang")) {
+            tfNamaPenumpang4.setText("");
+            tfNamaPenumpang4.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang4FocusGained
+
+    private void tfNamaPenumpang4FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPenumpang4FocusLost
+        if (tfNamaPenumpang4.getText().equals("")) {
+            tfNamaPenumpang4.setText("Nama Penumpang");
+            tfNamaPenumpang4.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_tfNamaPenumpang4FocusLost
+
+    private void btnCetakTiketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakTiketActionPerformed
+        // TODO add your handling code here:
+        cetakTiket();
+    }//GEN-LAST:event_btnCetakTiketActionPerformed
 
     /**
      * @param args the command line arguments
@@ -450,24 +747,21 @@ public class MenuPesan extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MenuPesan().setVisible(true);
+                new MenuPesann().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PanelKursi;
+    private javax.swing.JButton btnCetakTiket;
     private javax.swing.JToggleButton btnKembaliRiwayat;
-    private javax.swing.JButton btnRiwayat;
+    private javax.swing.JToggleButton buttonBayar;
     private javax.swing.JLabel exit;
     private javax.swing.JLabel iconMember;
     private javax.swing.JLabel iconMember1;
     private javax.swing.JLabel iconMember2;
     private javax.swing.JLabel iconMember3;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
-    private javax.swing.JComboBox<String> jComboBox4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
@@ -476,21 +770,26 @@ public class MenuPesan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
-    private javax.swing.JTextField jTextField8;
-    private javax.swing.JToggleButton jToggleButton1;
-    private javax.swing.JLabel labelUpdateKursi;
+    private javax.swing.JLabel labelTiket;
     private javax.swing.JLabel minimize;
+    private javax.swing.JPanel panelPenumpang;
+    private javax.swing.JPanel panelPenumpang2;
+    private javax.swing.JPanel panelPenumpang3;
+    private javax.swing.JPanel panelPenumpang4;
+    private javax.swing.JTextField tfNamaPenumpang1;
+    private javax.swing.JTextField tfNamaPenumpang2;
+    private javax.swing.JTextField tfNamaPenumpang3;
+    private javax.swing.JTextField tfNamaPenumpang4;
     // End of variables declaration//GEN-END:variables
+
+    private static class MenuPesann {
+
+        public MenuPesann() {
+        }
+
+        private void setVisible(boolean b) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+    }
 }

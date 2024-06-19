@@ -178,7 +178,7 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel8" alignment="0" max="32767" attributes="0"/>
-                  <Component id="labelUpdateKursi" alignment="0" max="32767" attributes="0"/>
+                  <Component id="labelUpdateCustomer" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
                       <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
@@ -193,7 +193,7 @@
                       <EmptySpace pref="24" max="32767" attributes="0"/>
                       <Component id="jLabel9" min="-2" pref="38" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="labelUpdateKursi" min="-2" pref="25" max="-2" attributes="0"/>
+                      <Component id="labelUpdateCustomer" min="-2" pref="25" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -240,7 +240,7 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JLabel" name="labelUpdateKursi">
+            <Component class="javax.swing.JLabel" name="labelUpdateCustomer">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>

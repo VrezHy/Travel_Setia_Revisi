@@ -4,6 +4,21 @@
  */
 package travelsetia;
 
+import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableRowSorter;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author dimas
@@ -13,8 +28,45 @@ public class MenuRiwayat1 extends javax.swing.JPanel {
     /**
      * Creates new form MenuRiwayat1
      */
+    private Connection conn;
     public MenuRiwayat1() {
         initComponents();
+        loadDataToTable();
+    }
+    
+    private void loadDataToTable() {
+
+        conn = Koneksi.bukaKoneksi();
+        System.out.println(conn);
+        String sql = "SELECT namaPenumpang, jumlahPembayaran, tanggalTransaksi FROM detail_transaksi;";
+        try (PreparedStatement pst = conn.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
+
+            // Inisialisasi DefaultTableModel dengan kolom yang ditentukan
+            DefaultTableModel model = new DefaultTableModel();
+            model.setColumnIdentifiers(new Object[]{
+                "Nama Penumpang",
+                "Jumlah Pembayaran",
+                "Tanggal Transaksi",
+            });
+
+            // Memproses ResultSet dan menambahkan data ke model
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("namaPenumpang"),
+                    rs.getString("jumlahPembayaran"),
+                    rs.getString("tanggalTransaksi"),
+                });
+            }
+
+            // Set the model to your JTable
+            tabelRiwayat.setModel(model);
+            tabelRiwayat.setDefaultEditor(Object.class, null); // Nonaktifkan pengeditan sel
+            tabelRiwayat.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Hanya pilih satu baris
+          
+
+        } catch (SQLException ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
     }
 
     /**
@@ -29,7 +81,7 @@ public class MenuRiwayat1 extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tabelPenumpang = new javax.swing.JTable();
+        tabelRiwayat = new javax.swing.JTable();
         iconMember = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
 
@@ -44,7 +96,7 @@ public class MenuRiwayat1 extends javax.swing.JPanel {
         jLabel2.setText("Riwayat pemesanan");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, 190, 30));
 
-        tabelPenumpang.setModel(new javax.swing.table.DefaultTableModel(
+        tabelRiwayat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -55,7 +107,7 @@ public class MenuRiwayat1 extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tabelPenumpang);
+        jScrollPane1.setViewportView(tabelRiwayat);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 760, 490));
 
@@ -78,6 +130,6 @@ public class MenuRiwayat1 extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tabelPenumpang;
+    private javax.swing.JTable tabelRiwayat;
     // End of variables declaration//GEN-END:variables
 }

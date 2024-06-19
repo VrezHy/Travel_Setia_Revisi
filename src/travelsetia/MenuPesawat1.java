@@ -42,161 +42,257 @@ public class MenuPesawat1 extends javax.swing.JPanel {
     }
 
     private void loadDataToTable() {
+    conn = Koneksi.bukaKoneksi();
+    System.out.println(conn);
+    String sql = "SELECT j.idPenerbangan, j.bandaraKeberangkatan, j.bandaraTujuan, j.tanggalKeberangkatan, j.tanggalKedatangan, p.namaPesawat, p.harga, k.kursiTersedia, t.tiketTersedia FROM jadwalpenerbangan j LEFT JOIN pesawat p ON j.idPesawat = p.idPesawat LEFT JOIN kapasitas_kursi k ON j.idPenerbangan = k.idPenerbangan LEFT JOIN ketersediaan_tiket t ON j.idPenerbangan = t.idKetersediaan;";
+    try (PreparedStatement pst = conn.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
+        // Inisialisasi DefaultTableModel dengan kolom yang ditentukan
+        DefaultTableModel model = new DefaultTableModel();
+        model.setColumnIdentifiers(new Object[]{
+            "Nomor Penerbangan",
+            "Bandara Keberangkatan",
+            "Bandara Tujuan",
+            "Maskapai",
+            "Tanggal Keberangkatan",
+            "Tanggal Kedatangan",
+            "Harga",
+            "Kursi Tersedia",
+            "Tiket",
+        });
 
-        conn = Koneksi.bukaKoneksi();
-        System.out.println(conn);
-        String sql = "SELECT p.idPesawat, p.namaPesawat, b.namaBandara AS kotaKeberangkatan, p.destinasi, jp.tanggalKeberangkatan, p.kursiTersedia, p.harga, p.statusKursi\n"
-                + "FROM pesawat p \n"
-                + "LEFT JOIN bandara b ON p.destinasi = b.kota\n"
-                + "LEFT JOIN jadwalpenerbangan jp ON p.idPesawat = jp.idPesawat\n"
-                + "ORDER BY jp.tanggalKeberangkatan ASC;";
-        try {
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-
-            DefaultTableModel model = new DefaultTableModel();
-            model.setColumnIdentifiers(new Object[]{"ID Pesawat", "Nama Pesawat", "Kota Keberangkatan", "Destinasi", "Tanggal Keberangkatan", "Kursi Tersedia", "Harga", "Status Kursi"});
-
-            while (rs.next()) {
-                
-                String statusKursi;
-                if (rs.getInt("kursiTersedia") > 0){
-                    statusKursi = "ada";
-                } else {
-                    statusKursi = " habis ";
-                }
-                model.addRow(new Object[]{
-                    rs.getInt("idPesawat"),
-                    rs.getString("namaPesawat"),
-                    rs.getString("kotaKeberangkatan"),
-                    rs.getString("destinasi"),
-                    rs.getString("tanggalKeberangkatan"),
-                    rs.getInt("kursiTersedia"),
-                    rs.getInt("harga"),
-                    statusKursi
-                    
-                });
-            }
-
-            tabelPesawatAdmin.setModel(model);
-            tabelPesawatAdmin.setDefaultEditor(Object.class, null);
-
-        } catch (Exception ex) {
-            System.out.println("Error : " + ex.getMessage());
+        // Memproses ResultSet dan menambahkan data ke model
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getString("idPenerbangan"),
+                rs.getString("bandaraKeberangkatan"),
+                rs.getString("bandaraTujuan"),
+                rs.getString("namaPesawat"),
+                rs.getString("tanggalKeberangkatan"),
+                rs.getString("tanggalKedatangan"),
+                rs.getDouble("harga"),
+                rs.getInt("kursiTersedia"),
+                rs.getInt("tiketTersedia"),
+            });
         }
+
+        // Set the model to your JTable
+        tabelPesawatAdmin.setModel(model);
+        tabelPesawatAdmin.setDefaultEditor(Object.class, null); // Nonaktifkan pengeditan sel
+        tabelPesawatAdmin.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Hanya pilih satu baris
+
+    } catch (SQLException ex) {
+        System.out.println(ex);
     }
+}
+
 
     private void insertRow() {
-        String namaPesawat = tfMaskapai.getText();
-        String kotaKeberangkatan = tfKotaKeberangkatan.getText();
-        String destinasi = tfDestinasi.getText();
-        String tanggalBerangkat = tfTanggalBerangkat.getText();
-        int kursiTersedia = Integer.parseInt(tfkursiTersedia.getText());
-        int harga = Integer.parseInt(txtTotalBayar.getText());
+    String namaPesawat = tfMaskapai.getText();
+    String bandaraKeberangkatan = tfBandaraKeberangkatan.getText();
+    String bandaraTujuan = tfBandaraKedatangan.getText();
+    String tanggalKeberangkatan = tfTanggalBerangkat.getText();
+    String tanggalKedatangan = tfTanggalKedatangan.getText();
+    int kursiTersedia = Integer.parseInt(tfKursiTersedia.getText());
+    int harga = Integer.parseInt(tfHarga.getText());
+    int tiketTersedia = Integer.parseInt(tfTiket.getText());
 
-        // Query INSERT yang benar
-        String sql = "INSERT INTO pesawat (namaPesawat, destinasi, kursiTersedia, harga) VALUES (?, ?, ?, ?)";
-        try {
-            // Menggunakan RETURN_GENERATED_KEYS untuk mendapatkan kunci yang dihasilkan
-            PreparedStatement pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1, namaPesawat);
-            pst.setString(2, destinasi);
-            pst.setInt(3, kursiTersedia);
-            pst.setInt(4, harga);
-            pst.executeUpdate();
-            System.out.println("Row inserted successfully.");
+    // Query INSERT yang benar
+    String sqlPesawat = "INSERT INTO pesawat (namaPesawat, harga) VALUES (?, ?)";
+    try {
+        // Menggunakan RETURN_GENERATED_KEYS untuk mendapatkan kunci yang dihasilkan
+        PreparedStatement pstPesawat = conn.prepareStatement(sqlPesawat, Statement.RETURN_GENERATED_KEYS);
+        pstPesawat.setString(1, namaPesawat);
+        pstPesawat.setInt(2, harga);
+        pstPesawat.executeUpdate();
+        System.out.println("Row inserted successfully into pesawat.");
 
-            // Dapatkan ID yang dihasilkan
-            ResultSet rs = pst.getGeneratedKeys();
-            if (rs.next()) {
-                int idPesawat = rs.getInt(1);
+        // Dapatkan ID yang dihasilkan
+        ResultSet rsPesawat = pstPesawat.getGeneratedKeys();
+        if (rsPesawat.next()) {
+            int idPesawat = rsPesawat.getInt(1);
+
+            // Insert data into jadwalpenerbangan
+            String sqlJadwal = "INSERT INTO jadwalpenerbangan (idPesawat, bandaraKeberangkatan, bandaraTujuan, tanggalKeberangkatan, tanggalKedatangan) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement pstJadwal = conn.prepareStatement(sqlJadwal, Statement.RETURN_GENERATED_KEYS);
+            pstJadwal.setInt(1, idPesawat);
+            pstJadwal.setString(2, bandaraKeberangkatan);
+            pstJadwal.setString(3, bandaraTujuan);
+            pstJadwal.setString(4, tanggalKeberangkatan);
+            pstJadwal.setString(5, tanggalKedatangan);
+            pstJadwal.executeUpdate();
+            System.out.println("Row inserted successfully into jadwalpenerbangan.");
+
+            ResultSet rsJadwal = pstJadwal.getGeneratedKeys();
+            if (rsJadwal.next()) {
+                int idPenerbangan = rsJadwal.getInt(1);
+
+                // Insert data into kapasitas_kursi
+                String sqlKursi = "INSERT INTO kapasitas_kursi (idPenerbangan, kursiTersedia) VALUES (?, ?)";
+                PreparedStatement pstKursi = conn.prepareStatement(sqlKursi);
+                pstKursi.setInt(1, idPenerbangan);
+                pstKursi.setInt(2, kursiTersedia);
+                pstKursi.executeUpdate();
+                System.out.println("Row inserted successfully into kapasitas_kursi.");
+
+                // Insert data into ketersediaan_tiket
+                String sqlTiket = "INSERT INTO ketersediaan_tiket (idPenerbangan, tiketTersedia) VALUES (?, ?)";
+                PreparedStatement pstTiket = conn.prepareStatement(sqlTiket);
+                pstTiket.setInt(1, idPenerbangan);
+                pstTiket.setInt(2, tiketTersedia);
+                pstTiket.executeUpdate();
+                System.out.println("Row inserted successfully into ketersediaan_tiket.");
 
                 // Tambahkan baris baru ke model tabel
                 DefaultTableModel model = (DefaultTableModel) tabelPesawatAdmin.getModel();
-                model.addRow(new Object[]{idPesawat, namaPesawat, kotaKeberangkatan, destinasi, tanggalBerangkat, kursiTersedia, harga});
+                model.addRow(new Object[]{idPenerbangan, bandaraKeberangkatan, bandaraTujuan, namaPesawat, tanggalKeberangkatan, tanggalKedatangan, harga, kursiTersedia, tiketTersedia});
             }
-        } catch (Exception ex) {
-            System.out.println("Error : " + ex.getMessage());
         }
+    } catch (Exception ex) {
+        System.out.println("Error : " + ex.getMessage());
     }
+}
+
 
     private void updateTextFields() {
         int row = tabelPesawatAdmin.getSelectedRow();
+        row = tabelPesawatAdmin.convertRowIndexToModel(row);
         DefaultTableModel model = (DefaultTableModel) tabelPesawatAdmin.getModel();
-        String namaPesawat = model.getValueAt(row, 1) != null ? model.getValueAt(row, 1).toString() : "";
-        String kotaKeberangkatan = model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "";
-        String destinasi = model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "";
-        String waktuKeberangkatan = model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "";
-        String kursiTersedia = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
-        String harga = model.getValueAt(row, 6) != null ? model.getValueAt(row, 6).toString() : "";
 
-        tfMaskapai.setText(namaPesawat);
-        tfKotaKeberangkatan.setText(kotaKeberangkatan);
-        tfDestinasi.setText(destinasi);
-        tfTanggalBerangkat.setText(waktuKeberangkatan);
-        tfkursiTersedia.setText(kursiTersedia);
-        txtTotalBayar.setText(harga);
+        // Ambil nilai berdasarkan urutan kolom yang sesuai
+        String bandaraKeberangkatan = model.getValueAt(row, 1) != null ? model.getValueAt(row, 1).toString() : "";
+        String bandaraTujuan = model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "";
+        String namaPesawat = model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "";
+        String tanggalKeberangkatan = model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "";
+        String tanggalKedatangan = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
+        String totalHarga = model.getValueAt(row, 6) != null ? model.getValueAt(row, 6).toString() : "";
+        String kursiTersedia = model.getValueAt(row, 7) != null ? model.getValueAt(row, 7).toString() : "";
+        String tiket = model.getValueAt(row, 8) != null ? model.getValueAt(row, 8).toString() : "";
+        
+
+        tfBandaraKeberangkatan.setText(bandaraKeberangkatan);
+        tfBandaraKedatangan.setText(bandaraTujuan);
+        tfTanggalBerangkat.setText(tanggalKeberangkatan);
+        tfTanggalKedatangan.setText(tanggalKedatangan); //
+        tfMaskapai.setText(namaPesawat); //
+        tfKursiTersedia.setText(kursiTersedia);
+        tfHarga.setText(totalHarga);
+        tfTiket.setText(tiket);
+        
+
     }
 
     private void updateSelectedRow() {
-        int row = tabelPesawatAdmin.getSelectedRow();
-        if (row != -1) {
-            DefaultTableModel model = (DefaultTableModel) tabelPesawatAdmin.getModel();
-            int idPesawat = (int) model.getValueAt(row, 0);
+    int row = tabelPesawatAdmin.getSelectedRow();
+    if (row != -1) {
+        DefaultTableModel model = (DefaultTableModel) tabelPesawatAdmin.getModel();
+        int idPenerbangan = Integer.parseInt(model.getValueAt(row, 0).toString());  // Ensure correct type conversion
 
-            String namaPesawat = tfMaskapai.getText();
-            String kotaKeberangkatan = tfKotaKeberangkatan.getText();
-            String destinasi = tfDestinasi.getText();
-            String tanggalBerangkat = tfTanggalBerangkat.getText();
-            int kursiTersedia = Integer.parseInt(tfkursiTersedia.getText());
-            int harga = Integer.parseInt(txtTotalBayar.getText());
+        String namaPesawat = tfMaskapai.getText();
+        String bandaraKeberangkatan = tfBandaraKeberangkatan.getText();
+        String bandaraTujuan = tfBandaraKedatangan.getText();
+        String tanggalKeberangkatan = tfTanggalBerangkat.getText();
+        String tanggalKedatangan = tfTanggalKedatangan.getText();
+        int kursiTersedia = Integer.parseInt(tfKursiTersedia.getText());
+        int harga = Integer.parseInt(tfHarga.getText());
+        int tiketTersedia = Integer.parseInt(tfTiket.getText());
 
-            // Update di database
-            String sql = "UPDATE pesawat SET namaPesawat = ?, destinasi = ?, kursiTersedia = ?, harga = ? WHERE idPesawat = ?";
-            try {
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.setString(1, namaPesawat);
-                pst.setString(2, destinasi);
-                pst.setInt(3, kursiTersedia);
-                pst.setInt(4, harga);
-                pst.setInt(5, idPesawat);
-                pst.executeUpdate();
-                System.out.println("Row updated successfully.");
-            } catch (Exception ex) {
-                System.out.println("Error : " + ex.getMessage());
-            }
+        try {
+            // Update pesawat
+            String sqlPesawat = "UPDATE pesawat SET namaPesawat = ?, harga = ? WHERE idPesawat = (SELECT idPesawat FROM jadwalpenerbangan WHERE idPenerbangan = ?)";
+            PreparedStatement pstPesawat = conn.prepareStatement(sqlPesawat);
+            pstPesawat.setString(1, namaPesawat);
+            pstPesawat.setInt(2, harga);
+            pstPesawat.setInt(3, idPenerbangan);
+            pstPesawat.executeUpdate();
 
-            // Update di tabel
-            model.setValueAt(namaPesawat, row, 1);
-            model.setValueAt(kotaKeberangkatan, row, 2);
-            model.setValueAt(destinasi, row, 3);
-            model.setValueAt(tanggalBerangkat, row, 4);
-            model.setValueAt(kursiTersedia, row, 5);
+            // Update jadwalpenerbangan
+            String sqlJadwal = "UPDATE jadwalpenerbangan SET bandaraKeberangkatan = ?, bandaraTujuan = ?, tanggalKeberangkatan = ?, tanggalKedatangan = ? WHERE idPenerbangan = ?";
+            PreparedStatement pstJadwal = conn.prepareStatement(sqlJadwal);
+            pstJadwal.setString(1, bandaraKeberangkatan);
+            pstJadwal.setString(2, bandaraTujuan);
+            pstJadwal.setString(3, tanggalKeberangkatan);
+            pstJadwal.setString(4, tanggalKedatangan);
+            pstJadwal.setInt(5, idPenerbangan);
+            pstJadwal.executeUpdate();
+
+            // Update kapasitas_kursi
+            String sqlKursi = "UPDATE kapasitas_kursi SET kursiTersedia = ? WHERE idPenerbangan = ?";
+            PreparedStatement pstKursi = conn.prepareStatement(sqlKursi);
+            pstKursi.setInt(1, kursiTersedia);
+            pstKursi.setInt(2, idPenerbangan);
+            pstKursi.executeUpdate();
+
+            // Update ketersediaan_tiket
+            String sqlTiket = "UPDATE ketersediaan_tiket SET tiketTersedia = ? WHERE idPenerbangan = ?";
+            PreparedStatement pstTiket = conn.prepareStatement(sqlTiket);
+            pstTiket.setInt(1, tiketTersedia);
+            pstTiket.setInt(2, idPenerbangan);
+            pstTiket.executeUpdate();
+
+            System.out.println("Row updated successfully.");
+
+            // Update table model
+            model.setValueAt(namaPesawat, row, 3);
+            model.setValueAt(bandaraKeberangkatan, row, 1);
+            model.setValueAt(bandaraTujuan, row, 2);
+            model.setValueAt(tanggalKeberangkatan, row, 4);
+            model.setValueAt(tanggalKedatangan, row, 5);
             model.setValueAt(harga, row, 6);
+            model.setValueAt(kursiTersedia, row, 7);
+            model.setValueAt(tiketTersedia, row, 8);
+
+        } catch (SQLException ex) {
+            
+            System.out.println("Error : " + ex.getMessage());
         }
     }
+}
 
+    
     private void deleteSelectedRow() {
-        int row = tabelPesawatAdmin.getSelectedRow();
-        if (row != -1) {
-            DefaultTableModel model = (DefaultTableModel) tabelPesawatAdmin.getModel();
-            int idPesawat = (int) model.getValueAt(row, 0);
+    int row = tabelPesawatAdmin.getSelectedRow();
+    if (row != -1) {
+        DefaultTableModel model = (DefaultTableModel) tabelPesawatAdmin.getModel();
+        int idPenerbangan = Integer.parseInt(model.getValueAt(row, 0).toString());  // Ensure correct type conversion
 
-            // Hapus dari database
-            String sql = "DELETE FROM pesawat WHERE idPesawat = ?";
-            try {
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.setInt(1, idPesawat);
-                pst.executeUpdate();
-                System.out.println("Row deleted successfully.");
-            } catch (Exception ex) {
-                System.out.println("Error : " + ex.getMessage());
-            }
+        try {
+            // Delete from ketersediaan_tiket
+            String sqlTiket = "DELETE FROM ketersediaan_tiket WHERE idPenerbangan = ?";
+            PreparedStatement pstTiket = conn.prepareStatement(sqlTiket);
+            pstTiket.setInt(1, idPenerbangan);
+            pstTiket.executeUpdate();
 
-            // Hapus dari tabel
+            // Delete from kapasitas_kursi
+            String sqlKursi = "DELETE FROM kapasitas_kursi WHERE idPenerbangan = ?";
+            PreparedStatement pstKursi = conn.prepareStatement(sqlKursi);
+            pstKursi.setInt(1, idPenerbangan);
+            pstKursi.executeUpdate();
+
+            // Delete from jadwalpenerbangan
+            String sqlJadwal = "DELETE FROM jadwalpenerbangan WHERE idPenerbangan = ?";
+            PreparedStatement pstJadwal = conn.prepareStatement(sqlJadwal);
+            pstJadwal.setInt(1, idPenerbangan);
+            pstJadwal.executeUpdate();
+
+            // Delete from pesawat (using subquery to find idPesawat)
+            String sqlPesawat = "DELETE FROM pesawat WHERE idPesawat = (SELECT idPesawat FROM jadwalpenerbangan WHERE idPenerbangan = ?)";
+            PreparedStatement pstPesawat = conn.prepareStatement(sqlPesawat);
+            pstPesawat.setInt(1, idPenerbangan);
+            pstPesawat.executeUpdate();
+
+            System.out.println("Row deleted successfully.");
+
+            // Remove row from table model
             model.removeRow(row);
+
+        } catch (SQLException ex) {
+            System.out.println("Error : " + ex.getMessage());
         }
     }
+}
+
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -215,13 +311,14 @@ public class MenuPesawat1 extends javax.swing.JPanel {
         buttonHapus = new javax.swing.JButton();
         iconPesawat = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        txtTotalBayar = new javax.swing.JTextField();
+        tfTiket = new javax.swing.JTextField();
         tfMaskapai = new javax.swing.JTextField();
-        tfKotaKeberangkatan = new javax.swing.JTextField();
-        tfDestinasi = new javax.swing.JTextField();
+        tfBandaraKeberangkatan = new javax.swing.JTextField();
+        tfBandaraKedatangan = new javax.swing.JTextField();
         tfTanggalBerangkat = new javax.swing.JTextField();
-        tfkursiTersedia = new javax.swing.JTextField();
-        txtTotalBayar1 = new javax.swing.JTextField();
+        tfKursiTersedia = new javax.swing.JTextField();
+        tfHarga = new javax.swing.JTextField();
+        tfTanggalKedatangan = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(53, 114, 239));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -298,22 +395,22 @@ public class MenuPesawat1 extends javax.swing.JPanel {
         jLabel3.setText("Master Data > Pesawat");
         add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 0, 260, 30));
 
-        txtTotalBayar.setForeground(new java.awt.Color(153, 153, 153));
-        txtTotalBayar.setText("Harga");
-        txtTotalBayar.addFocusListener(new java.awt.event.FocusAdapter() {
+        tfTiket.setForeground(new java.awt.Color(153, 153, 153));
+        tfTiket.setText("Tiket");
+        tfTiket.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                txtTotalBayarFocusGained(evt);
+                tfTiketFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                txtTotalBayarFocusLost(evt);
+                tfTiketFocusLost(evt);
             }
         });
-        txtTotalBayar.addActionListener(new java.awt.event.ActionListener() {
+        tfTiket.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTotalBayarActionPerformed(evt);
+                tfTiketActionPerformed(evt);
             }
         });
-        add(txtTotalBayar, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 190, 290, 30));
+        add(tfTiket, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 190, 290, 30));
 
         tfMaskapai.setForeground(new java.awt.Color(153, 153, 153));
         tfMaskapai.setText("Nama Pesawat");
@@ -330,41 +427,41 @@ public class MenuPesawat1 extends javax.swing.JPanel {
                 tfMaskapaiActionPerformed(evt);
             }
         });
-        add(tfMaskapai, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 300, 70));
+        add(tfMaskapai, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 300, 30));
 
-        tfKotaKeberangkatan.setForeground(new java.awt.Color(153, 153, 153));
-        tfKotaKeberangkatan.setText("Kota Keberangkatan");
-        tfKotaKeberangkatan.addFocusListener(new java.awt.event.FocusAdapter() {
+        tfBandaraKeberangkatan.setForeground(new java.awt.Color(153, 153, 153));
+        tfBandaraKeberangkatan.setText("Bandara Keberangkatan");
+        tfBandaraKeberangkatan.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                tfKotaKeberangkatanFocusGained(evt);
+                tfBandaraKeberangkatanFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                tfKotaKeberangkatanFocusLost(evt);
+                tfBandaraKeberangkatanFocusLost(evt);
             }
         });
-        tfKotaKeberangkatan.addActionListener(new java.awt.event.ActionListener() {
+        tfBandaraKeberangkatan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfKotaKeberangkatanActionPerformed(evt);
+                tfBandaraKeberangkatanActionPerformed(evt);
             }
         });
-        add(tfKotaKeberangkatan, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, 300, 30));
+        add(tfBandaraKeberangkatan, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, 300, 30));
 
-        tfDestinasi.setForeground(new java.awt.Color(153, 153, 153));
-        tfDestinasi.setText("Destinasi");
-        tfDestinasi.addFocusListener(new java.awt.event.FocusAdapter() {
+        tfBandaraKedatangan.setForeground(new java.awt.Color(153, 153, 153));
+        tfBandaraKedatangan.setText("Bandara Kedatangan");
+        tfBandaraKedatangan.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                tfDestinasiFocusGained(evt);
+                tfBandaraKedatanganFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                tfDestinasiFocusLost(evt);
+                tfBandaraKedatanganFocusLost(evt);
             }
         });
-        tfDestinasi.addActionListener(new java.awt.event.ActionListener() {
+        tfBandaraKedatangan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfDestinasiActionPerformed(evt);
+                tfBandaraKedatanganActionPerformed(evt);
             }
         });
-        add(tfDestinasi, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 190, 300, 30));
+        add(tfBandaraKedatangan, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, 300, 30));
 
         tfTanggalBerangkat.setForeground(new java.awt.Color(153, 153, 153));
         tfTanggalBerangkat.setText("Tanggal Keberangkatan");
@@ -376,58 +473,70 @@ public class MenuPesawat1 extends javax.swing.JPanel {
                 tfTanggalBerangkatFocusLost(evt);
             }
         });
-        add(tfTanggalBerangkat, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 70, 290, 30));
+        add(tfTanggalBerangkat, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 190, 300, 30));
 
-        tfkursiTersedia.setForeground(new java.awt.Color(153, 153, 153));
-        tfkursiTersedia.setText("Kursi Tersedia");
-        tfkursiTersedia.addFocusListener(new java.awt.event.FocusAdapter() {
+        tfKursiTersedia.setForeground(new java.awt.Color(153, 153, 153));
+        tfKursiTersedia.setText("Kursi Tersedia");
+        tfKursiTersedia.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                tfkursiTersediaFocusGained(evt);
+                tfKursiTersediaFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                tfkursiTersediaFocusLost(evt);
+                tfKursiTersediaFocusLost(evt);
             }
         });
-        tfkursiTersedia.addActionListener(new java.awt.event.ActionListener() {
+        tfKursiTersedia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfkursiTersediaActionPerformed(evt);
+                tfKursiTersediaActionPerformed(evt);
             }
         });
-        add(tfkursiTersedia, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 110, 290, 30));
+        add(tfKursiTersedia, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 110, 290, 30));
 
-        txtTotalBayar1.setForeground(new java.awt.Color(153, 153, 153));
-        txtTotalBayar1.setText("Harga");
-        txtTotalBayar1.addFocusListener(new java.awt.event.FocusAdapter() {
+        tfHarga.setForeground(new java.awt.Color(153, 153, 153));
+        tfHarga.setText("Harga");
+        tfHarga.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                txtTotalBayar1FocusGained(evt);
+                tfHargaFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                txtTotalBayar1FocusLost(evt);
+                tfHargaFocusLost(evt);
             }
         });
-        txtTotalBayar1.addActionListener(new java.awt.event.ActionListener() {
+        tfHarga.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTotalBayar1ActionPerformed(evt);
+                tfHargaActionPerformed(evt);
             }
         });
-        add(txtTotalBayar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 150, 290, 30));
+        add(tfHarga, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 150, 290, 30));
+
+        tfTanggalKedatangan.setForeground(new java.awt.Color(153, 153, 153));
+        tfTanggalKedatangan.setText("Tanggal Kedatangan");
+        tfTanggalKedatangan.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfTanggalKedatanganFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tfTanggalKedatanganFocusLost(evt);
+            }
+        });
+        add(tfTanggalKedatangan, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 70, 290, 30));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tfkursiTersediaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfkursiTersediaActionPerformed
+    private void tfKursiTersediaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfKursiTersediaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_tfkursiTersediaActionPerformed
+    }//GEN-LAST:event_tfKursiTersediaActionPerformed
 
     private void tfMaskapaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfMaskapaiActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tfMaskapaiActionPerformed
 
-    private void txtTotalBayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalBayarActionPerformed
+    private void tfTiketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfTiketActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtTotalBayarActionPerformed
+    }//GEN-LAST:event_tfTiketActionPerformed
 
-    private void tfDestinasiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfDestinasiActionPerformed
+    private void tfBandaraKedatanganActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfBandaraKedatanganActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_tfDestinasiActionPerformed
+    }//GEN-LAST:event_tfBandaraKedatanganActionPerformed
 
     private void tabelPesawatAdminMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelPesawatAdminMouseClicked
         updateTextFields();
@@ -461,40 +570,40 @@ public class MenuPesawat1 extends javax.swing.JPanel {
 
     }//GEN-LAST:event_tfMaskapaiFocusLost
 
-    private void tfKotaKeberangkatanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfKotaKeberangkatanActionPerformed
+    private void tfBandaraKeberangkatanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfBandaraKeberangkatanActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_tfKotaKeberangkatanActionPerformed
+    }//GEN-LAST:event_tfBandaraKeberangkatanActionPerformed
 
-    private void tfKotaKeberangkatanFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfKotaKeberangkatanFocusGained
-        if (tfKotaKeberangkatan.getText().equals("Kota Keberangkatan")) {
-            tfKotaKeberangkatan.setText("");
-            tfKotaKeberangkatan.setForeground(new Color(153, 153, 153));
+    private void tfBandaraKeberangkatanFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfBandaraKeberangkatanFocusGained
+        if (tfBandaraKeberangkatan.getText().equals("Bandara Keberangkatan")) {
+            tfBandaraKeberangkatan.setText("");
+            tfBandaraKeberangkatan.setForeground(new Color(153, 153, 153));
         }
 
-    }//GEN-LAST:event_tfKotaKeberangkatanFocusGained
+    }//GEN-LAST:event_tfBandaraKeberangkatanFocusGained
 
-    private void tfKotaKeberangkatanFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfKotaKeberangkatanFocusLost
-        if (tfKotaKeberangkatan.getText().equals("")) {
-            tfKotaKeberangkatan.setText("Kota Keberangkata");
-            tfKotaKeberangkatan.setForeground(new Color(153, 153, 153));
+    private void tfBandaraKeberangkatanFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfBandaraKeberangkatanFocusLost
+        if (tfBandaraKeberangkatan.getText().equals("")) {
+            tfBandaraKeberangkatan.setText("Bandara Keberangkatan");
+            tfBandaraKeberangkatan.setForeground(new Color(153, 153, 153));
         }
-    }//GEN-LAST:event_tfKotaKeberangkatanFocusLost
+    }//GEN-LAST:event_tfBandaraKeberangkatanFocusLost
 
-    private void tfDestinasiFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfDestinasiFocusGained
-        if (tfDestinasi.getText().equals("Destinasi")) {
-            tfDestinasi.setText("");
-            tfDestinasi.setForeground(new Color(153, 153, 153));
-        }
-
-    }//GEN-LAST:event_tfDestinasiFocusGained
-
-    private void tfDestinasiFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfDestinasiFocusLost
-        if (tfDestinasi.getText().equals("")) {
-            tfDestinasi.setText("Destinasi");
-            tfDestinasi.setForeground(new Color(153, 153, 153));
+    private void tfBandaraKedatanganFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfBandaraKedatanganFocusGained
+        if (tfBandaraKedatangan.getText().equals("Destinasi")) {
+            tfBandaraKedatangan.setText("");
+            tfBandaraKedatangan.setForeground(new Color(153, 153, 153));
         }
 
-    }//GEN-LAST:event_tfDestinasiFocusLost
+    }//GEN-LAST:event_tfBandaraKedatanganFocusGained
+
+    private void tfBandaraKedatanganFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfBandaraKedatanganFocusLost
+        if (tfBandaraKedatangan.getText().equals("")) {
+            tfBandaraKedatangan.setText("Destinasi");
+            tfBandaraKedatangan.setForeground(new Color(153, 153, 153));
+        }
+
+    }//GEN-LAST:event_tfBandaraKedatanganFocusLost
 
     private void tfTanggalBerangkatFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfTanggalBerangkatFocusGained
         if (tfTanggalBerangkat.getText().equals("Tanggal Keberangkatan")) {
@@ -512,49 +621,57 @@ public class MenuPesawat1 extends javax.swing.JPanel {
 
     }//GEN-LAST:event_tfTanggalBerangkatFocusLost
 
-    private void tfkursiTersediaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfkursiTersediaFocusGained
-        if (tfkursiTersedia.getText().equals("Kursi Tersedia")) {
-            tfkursiTersedia.setText("");
-            tfkursiTersedia.setForeground(new Color(153, 153, 153));
+    private void tfKursiTersediaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfKursiTersediaFocusGained
+        if (tfKursiTersedia.getText().equals("Kursi Tersedia")) {
+            tfKursiTersedia.setText("");
+            tfKursiTersedia.setForeground(new Color(153, 153, 153));
         }
 
-    }//GEN-LAST:event_tfkursiTersediaFocusGained
+    }//GEN-LAST:event_tfKursiTersediaFocusGained
 
-    private void tfkursiTersediaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfkursiTersediaFocusLost
-        if (tfkursiTersedia.getText().equals("")) {
-            tfkursiTersedia.setText("Kursi Tersedia");
-            tfkursiTersedia.setForeground(new Color(153, 153, 153));
+    private void tfKursiTersediaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfKursiTersediaFocusLost
+        if (tfKursiTersedia.getText().equals("")) {
+            tfKursiTersedia.setText("Kursi Tersedia");
+            tfKursiTersedia.setForeground(new Color(153, 153, 153));
         }
 
-    }//GEN-LAST:event_tfkursiTersediaFocusLost
+    }//GEN-LAST:event_tfKursiTersediaFocusLost
 
-    private void txtTotalBayarFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTotalBayarFocusGained
-        if (txtTotalBayar.getText().equals("Harga")) {
-            txtTotalBayar.setText("");
-            txtTotalBayar.setForeground(new Color(153, 153, 153));
+    private void tfTiketFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfTiketFocusGained
+        if (tfTiket.getText().equals("Harga")) {
+            tfTiket.setText("");
+            tfTiket.setForeground(new Color(153, 153, 153));
         }
 
-    }//GEN-LAST:event_txtTotalBayarFocusGained
+    }//GEN-LAST:event_tfTiketFocusGained
 
-    private void txtTotalBayarFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTotalBayarFocusLost
-        if (txtTotalBayar.getText().equals("")) {
-            txtTotalBayar.setText("Harga");
-            txtTotalBayar.setForeground(new Color(153, 153, 153));
+    private void tfTiketFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfTiketFocusLost
+        if (tfTiket.getText().equals("")) {
+            tfTiket.setText("Harga");
+            tfTiket.setForeground(new Color(153, 153, 153));
         }
 
-    }//GEN-LAST:event_txtTotalBayarFocusLost
+    }//GEN-LAST:event_tfTiketFocusLost
 
-    private void txtTotalBayar1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTotalBayar1FocusGained
+    private void tfHargaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfHargaFocusGained
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtTotalBayar1FocusGained
+    }//GEN-LAST:event_tfHargaFocusGained
 
-    private void txtTotalBayar1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTotalBayar1FocusLost
+    private void tfHargaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfHargaFocusLost
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtTotalBayar1FocusLost
+    }//GEN-LAST:event_tfHargaFocusLost
 
-    private void txtTotalBayar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalBayar1ActionPerformed
+    private void tfHargaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfHargaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtTotalBayar1ActionPerformed
+    }//GEN-LAST:event_tfHargaActionPerformed
+
+    private void tfTanggalKedatanganFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfTanggalKedatanganFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfTanggalKedatanganFocusGained
+
+    private void tfTanggalKedatanganFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfTanggalKedatanganFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfTanggalKedatanganFocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -566,12 +683,13 @@ public class MenuPesawat1 extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tabelPesawatAdmin;
-    private javax.swing.JTextField tfDestinasi;
-    private javax.swing.JTextField tfKotaKeberangkatan;
+    private javax.swing.JTextField tfBandaraKeberangkatan;
+    private javax.swing.JTextField tfBandaraKedatangan;
+    private javax.swing.JTextField tfHarga;
+    private javax.swing.JTextField tfKursiTersedia;
     private javax.swing.JTextField tfMaskapai;
     private javax.swing.JTextField tfTanggalBerangkat;
-    private javax.swing.JTextField tfkursiTersedia;
-    private javax.swing.JTextField txtTotalBayar;
-    private javax.swing.JTextField txtTotalBayar1;
+    private javax.swing.JTextField tfTanggalKedatangan;
+    private javax.swing.JTextField tfTiket;
     // End of variables declaration//GEN-END:variables
 }

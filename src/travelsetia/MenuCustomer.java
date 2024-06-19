@@ -45,6 +45,7 @@ public class MenuCustomer extends javax.swing.JFrame {
             // Inisialisasi DefaultTableModel dengan kolom yang ditentukan
             DefaultTableModel model = new DefaultTableModel();
             model.setColumnIdentifiers(new Object[]{
+                "Nomor Penerbangan",
                 "Bandara Keberangkatan",
                 "Bandara Tujuan",
                 "Maskapai",
@@ -70,11 +71,12 @@ public class MenuCustomer extends javax.swing.JFrame {
                 updateStatusKursi(idPenerbangan, statusKursi);
 
                 model.addRow(new Object[]{
+                    rs.getString("idPenerbangan"),
                     rs.getString("bandaraKeberangkatan"),
                     rs.getString("bandaraTujuan"),
+                    rs.getString("namaPesawat"),
                     rs.getString("tanggalKeberangkatan"),
                     rs.getString("tanggalKedatangan"),
-                    rs.getString("namaPesawat"),
                     rs.getDouble("harga"),
                     rs.getInt("kursiTersedia"),
                     statusKursi
@@ -98,14 +100,14 @@ public class MenuCustomer extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) jTablePesawat.getModel();
 
         // Ambil nilai berdasarkan urutan kolom yang sesuai
-        String bandaraKeberangkatan = model.getValueAt(row, 0) != null ? model.getValueAt(row, 0).toString() : "";
-        String bandaraTujuan = model.getValueAt(row, 1) != null ? model.getValueAt(row, 1).toString() : "";
-        String namaPesawat = model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "";
-        String tanggalKeberangkatan = model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "";
-        String tanggalKedatangan = model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "";
-        String totalHarga = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
-        String kursiTersedia = model.getValueAt(row, 6) != null ? model.getValueAt(row, 6).toString() : "";
-        String statusKursi = model.getValueAt(row, 7) != null ? model.getValueAt(row, 7).toString() : "";
+        String bandaraKeberangkatan = model.getValueAt(row, 1) != null ? model.getValueAt(row, 1).toString() : "";
+        String bandaraTujuan = model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "";
+        String namaPesawat = model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "";
+        String tanggalKeberangkatan = model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "";
+        String tanggalKedatangan = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
+        String totalHarga = model.getValueAt(row, 6) != null ? model.getValueAt(row, 6).toString() : "";
+        String kursiTersedia = model.getValueAt(row, 7) != null ? model.getValueAt(row, 7).toString() : "";
+        String statusKursi = model.getValueAt(row, 8) != null ? model.getValueAt(row, 8).toString() : "";
 
         tfBandaraAsal.setText(bandaraKeberangkatan);
         tfBandaraTujuan.setText(bandaraTujuan);
@@ -119,22 +121,55 @@ public class MenuCustomer extends javax.swing.JFrame {
     }
 
     private void updateTotalPrice() {
-        try {
-            int jumlahTiket = Integer.parseInt(CBtiketPenumpang.getSelectedItem().toString());
-            int selectedRow = jTablePesawat.getSelectedRow();
-            if (selectedRow != -1) {
-                double harga = Double.parseDouble(jTablePesawat.getValueAt(selectedRow, 5).toString());
-                double totalHarga = harga * jumlahTiket;
-                txtTotalBayar.setText(String.valueOf(totalHarga));
-            } else {
+
+        if (conn != null) {
+            PreparedStatement pstmt;
+            ResultSet rs;
+            try {
+                int jumlahTiket = Integer.parseInt(CBtiketPenumpang.getSelectedItem().toString());
+                int selectedRow = jTablePesawat.getSelectedRow();
+                if (selectedRow != -1) {
+                    double harga = Double.parseDouble(jTablePesawat.getValueAt(selectedRow, 6).toString());
+                    double totalHarga = harga * jumlahTiket;
+                    txtTotalBayar.setText(String.valueOf(totalHarga));
+
+                    // Get the idPenerbangan and kursiTersedia values
+                    int idPenerbangan = Integer.parseInt(jTablePesawat.getValueAt(selectedRow, 0).toString());
+                    int kursiTersedia = Integer.parseInt(jTablePesawat.getValueAt(selectedRow, 7).toString());
+
+                    if (kursiTersedia >= jumlahTiket) {
+                        conn = Koneksi.bukaKoneksi();
+                        // Update kursiTersedia
+                        kursiTersedia -= jumlahTiket;
+
+                        // Update the database
+                        // Update the JTable
+                        jTablePesawat.setValueAt(kursiTersedia, selectedRow, 7);
+                        jTablePesawat.setValueAt(kursiTersedia > 0 ? "ada" : "habis", selectedRow, 8);
+
+                        String updateJumlahTiketQuery = "UPDATE ketersediaan_tiket SET jumlahTiket = jumlahTiket + ? WHERE idPenerbangan = ?";
+                        pstmt = conn.prepareStatement(updateJumlahTiketQuery);
+                        pstmt.setInt(1, jumlahTiket);
+                        pstmt.setInt(2, idPenerbangan);
+                        pstmt.executeUpdate();
+
+                        String updatetiketTersedia = "UPDATE ketersediaan_tiket SET tiketTersedia = tiketTersedia - ? WHERE idPenerbangan = ?";
+                        pstmt = conn.prepareStatement(updatetiketTersedia);
+                        pstmt.setInt(1, jumlahTiket);
+                        pstmt.setInt(2, idPenerbangan);
+                        pstmt.executeUpdate();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Jumlah tiket melebihi kursi tersedia", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                    }
+                } else {
+                    txtTotalBayar.setText("0");
+                }
+            } catch (NumberFormatException e) {
                 txtTotalBayar.setText("0");
+                System.out.println("Error parsing number: " + e.getMessage());
+            } catch (SQLException e) {
+                System.out.println("SQL Error: " + e.getMessage());
             }
-        } catch (NumberFormatException e) {
-            txtTotalBayar.setText("0");
-            System.out.println("Error parsing number: " + e.getMessage());
-        } catch (Exception e) {
-            txtTotalBayar.setText("0");
-            System.out.println("Unexpected error: " + e.getMessage());
         }
     }
 
@@ -147,77 +182,6 @@ public class MenuCustomer extends javax.swing.JFrame {
             pst.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating status kursi: " + e.getMessage());
-        }
-    }
-
-    private void prosesBooking() {
-        int jumlahTiket = Integer.parseInt(CBtiketPenumpang.getSelectedItem().toString());
-        int selectedRow = jTablePesawat.getSelectedRow();
-        if (selectedRow != -1) {
-            int idPenerbangan = Integer.parseInt(jTablePesawat.getValueAt(selectedRow, 0).toString());
-            int kursiTersedia = Integer.parseInt(jTablePesawat.getValueAt(selectedRow, 7).toString()); // assuming kursiTersedia index is 7
-
-            if (kursiTersedia >= jumlahTiket) {
-                int kursiBaru = kursiTersedia - jumlahTiket;
-                updateKursiTersedia(idPenerbangan, kursiBaru);
-                catatPembelian(idPenerbangan, jumlahTiket);
-                JOptionPane.showMessageDialog(this, "Booking berhasil!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Maaf, kursi untuk penerbangan ini sudah habis.", "Peringatan", JOptionPane.WARNING_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Tidak ada baris yang dipilih.", "Peringatan", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void updateKursiTersedia(int idPenerbangan, int kursiBaru) {
-        String sqlUpdate = "UPDATE kapasitas_kursi SET kursiTersedia = ? WHERE idPenerbangan = ?";
-        try {
-            PreparedStatement pst = conn.prepareStatement(sqlUpdate);
-            pst.setInt(1, kursiBaru);
-            pst.setInt(2, idPenerbangan);
-            pst.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating available seats: " + e.getMessage());
-        }
-    }
-
-    private void catatPembelian(int idPenerbangan, int jumlahTiket) {
-        String sqlInsert = "INSERT INTO booking (idPenerbangan, jumlahTiket) VALUES (?, ?)";
-        try {
-            PreparedStatement pst = conn.prepareStatement(sqlInsert);
-            pst.setInt(1, idPenerbangan);
-            pst.setInt(2, jumlahTiket);
-            pst.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error inserting booking: " + e.getMessage());
-        }
-    }
-
-    private void printReceipt() {
-        int selectedRow = jTablePesawat.getSelectedRow();
-        if (selectedRow != -1) {
-            int kursiTersedia = Integer.parseInt(jTablePesawat.getValueAt(selectedRow, 7).toString()); // assuming kursiTersedia index is 7
-
-            if (kursiTersedia > 0) {
-                int jumlahTiket = Integer.parseInt(CBtiketPenumpang.getSelectedItem().toString());
-                String totalHarga = txtTotalBayar.getText();
-                String maskapai = tfMaskapai.getText();
-                String kotaKeberangkatan = tfBandaraAsal.getText();
-                String destinasi = tfBandaraTujuan.getText();
-                String tanggalBerangkat = tfTanggalKedatangan.getText();
-
-                String message = String.format(
-                        "Jumlah Tiket: %s\nTotal Harga: %s\nMaskapai: %s\nKota Keberangkatan: %s\nDestinasi: %s\nTanggal Berangkat: %s\n",
-                        jumlahTiket, totalHarga, maskapai, kotaKeberangkatan, destinasi, tanggalBerangkat
-                );
-
-                JOptionPane.showMessageDialog(this, message, "Rincian Pembayaran", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Maaf, kursi untuk penerbangan ini sudah habis.", "Peringatan", JOptionPane.WARNING_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Pilih penerbangan terlebih dahulu.", "Peringatan", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -257,7 +221,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         txtTotalBayar = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         btnPesan = new javax.swing.JButton();
-        btnCetakPembayaran = new javax.swing.JButton();
         jLabel15 = new javax.swing.JLabel();
         tfStatusKursi = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -269,7 +232,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
-        tfNamaPemesan = new javax.swing.JTextField();
         tfBandaraAsal = new javax.swing.JTextField();
         tfBandaraTujuan = new javax.swing.JTextField();
         tfTanggalKeberangkatan = new javax.swing.JTextField();
@@ -478,15 +440,7 @@ public class MenuCustomer extends javax.swing.JFrame {
                 btnPesanActionPerformed(evt);
             }
         });
-        tfff9.add(btnPesan, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 280, 130, -1));
-
-        btnCetakPembayaran.setText("Cetak Pembayaran");
-        btnCetakPembayaran.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCetakPembayaranActionPerformed(evt);
-            }
-        });
-        tfff9.add(btnCetakPembayaran, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 310, -1, -1));
+        tfff9.add(btnPesan, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 280, 280, -1));
 
         jLabel15.setForeground(new java.awt.Color(255, 255, 255));
         jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -553,22 +507,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel22.setText("Tanggal Kedatangan");
         tfff9.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 180, 30));
-
-        tfNamaPemesan.setText("Nama Pemesan");
-        tfNamaPemesan.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tfNamaPemesanFocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                tfNamaPemesanFocusLost(evt);
-            }
-        });
-        tfNamaPemesan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfNamaPemesanActionPerformed(evt);
-            }
-        });
-        tfff9.add(tfNamaPemesan, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 90, 280, 50));
 
         tfBandaraAsal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -768,12 +706,47 @@ public class MenuCustomer extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCariPenerbanganActionPerformed
 
     private void btnPesanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesanActionPerformed
-        prosesBooking();
+        int selectedRow = jTablePesawat.getSelectedRow();
+        if (selectedRow != -1) {
+            try {
+                int modelRowIndex = jTablePesawat.convertRowIndexToModel(selectedRow);
+                DefaultTableModel model = (DefaultTableModel) jTablePesawat.getModel();
+
+                String idBandaraStr = model.getValueAt(modelRowIndex, 0).toString();
+                int idPenerbangan = Integer.parseInt(idBandaraStr);
+                String bandaraKeberangkatan = model.getValueAt(modelRowIndex, 1).toString();
+                String bandaraTujuan = model.getValueAt(modelRowIndex, 2).toString();
+                String namaPesawat = model.getValueAt(modelRowIndex, 3).toString();
+                String tanggalKeberangkatan = model.getValueAt(modelRowIndex, 4).toString();
+                String kursiTersediaStr = model.getValueAt(modelRowIndex, 7).toString(); // Assuming kursiTersedia index is 7
+                int kursiTersedia = Integer.parseInt(kursiTersediaStr);
+                String statusKursi = model.getValueAt(modelRowIndex, 8).toString();
+                int jumlahPenumpang = Integer.parseInt(CBtiketPenumpang.getSelectedItem().toString());// Assuming statusKursi index is 8
+
+                // Assuming you get jumlahTiket from somewhere (e.g., a JComboBox)
+                int jumlahTiket = Integer.parseInt(CBtiketPenumpang.getSelectedItem().toString());
+
+                double harga = Double.parseDouble(model.getValueAt(modelRowIndex, 6).toString()); // Assuming harga index is 6
+                double totalHarga = harga * jumlahTiket;
+
+                // Pass parameters to MenuPesan constructor
+                MenuPesan pesan = new MenuPesan(bandaraKeberangkatan, bandaraTujuan, namaPesawat,
+                        tanggalKeberangkatan, totalHarga, jumlahTiket, kursiTersedia, idPenerbangan, jumlahPenumpang);
+                pesan.setVisible(true);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Format harga atau kursi tidak valid.", "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println(e);
+                e.printStackTrace(); // For debugging
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Terjadi kesalahan: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println(e);
+                e.printStackTrace(); // For debugging
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih penerbangan terlebih dahulu.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
+
     }//GEN-LAST:event_btnPesanActionPerformed
-
-    private void txtTotalBayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalBayarActionPerformed
-
-    }//GEN-LAST:event_txtTotalBayarActionPerformed
 
     private void tfStatusKursiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfStatusKursiActionPerformed
         // TODO add your handling code here:
@@ -784,12 +757,11 @@ public class MenuCustomer extends javax.swing.JFrame {
     }//GEN-LAST:event_jTablePesawatMouseClicked
 
     private void CBtiketPenumpangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CBtiketPenumpangActionPerformed
-        updateTotalPrice();
-    }//GEN-LAST:event_CBtiketPenumpangActionPerformed
 
-    private void btnCetakPembayaranActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakPembayaranActionPerformed
-        printReceipt();
-    }//GEN-LAST:event_btnCetakPembayaranActionPerformed
+        updateTotalPrice();
+
+
+    }//GEN-LAST:event_CBtiketPenumpangActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         tfStatusKursi.setEditable(false);
@@ -809,10 +781,6 @@ public class MenuCustomer extends javax.swing.JFrame {
         Login1Frame.setLocationRelativeTo(null);
         this.dispose();
     }//GEN-LAST:event_jLogoutActionPerformed
-
-    private void tfNamaPemesanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaPemesanActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfNamaPemesanActionPerformed
 
     private void tfBandaraAsalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfBandaraAsalActionPerformed
         // TODO add your handling code here:
@@ -838,21 +806,9 @@ public class MenuCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tfKursiTersediaActionPerformed
 
-    private void tfNamaPemesanFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPemesanFocusGained
-        // TODO add your handling code here:
-        if (tfNamaPemesan.getText().equals("Nama Pemesan")) {
-            tfNamaPemesan.setText("");
-            tfNamaPemesan.setForeground(new Color(153, 153, 153));
-        }
-    }//GEN-LAST:event_tfNamaPemesanFocusGained
+    private void txtTotalBayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalBayarActionPerformed
 
-    private void tfNamaPemesanFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNamaPemesanFocusLost
-        // TODO add your handling code here:
-        if (tfNamaPemesan.getText().equals("")) {
-            tfNamaPemesan.setText("Nama Pemesan");
-            tfNamaPemesan.setForeground(new Color(153, 153, 153));
-        }
-    }//GEN-LAST:event_tfNamaPemesanFocusLost
+    }//GEN-LAST:event_txtTotalBayarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -892,7 +848,6 @@ public class MenuCustomer extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BackroundCustomer;
     private javax.swing.JComboBox<String> CBtiketPenumpang;
-    private javax.swing.JButton btnCetakPembayaran;
     private javax.swing.JButton btnPesan;
     private javax.swing.JLabel exit;
     private javax.swing.JButton jButton1;
@@ -940,7 +895,6 @@ public class MenuCustomer extends javax.swing.JFrame {
     private javax.swing.JTextField tfBandaraTujuan;
     private javax.swing.JTextField tfKursiTersedia;
     private javax.swing.JTextField tfMaskapai;
-    private javax.swing.JTextField tfNamaPemesan;
     private javax.swing.JTextField tfStatusKursi;
     private javax.swing.JTextField tfTanggalKeberangkatan;
     private javax.swing.JTextField tfTanggalKedatangan;

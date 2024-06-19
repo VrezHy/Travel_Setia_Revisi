@@ -37,4 +37,16 @@ public class Koneksi {
         }
         return conn;
     }
+    
+    public static void tutupKoneksi() {
+        if (conn != null) {
+            try {
+                conn.close();
+                conn = null;
+                System.out.println("Koneksi ditutup!");
+            } catch (SQLException e) {
+                System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            }
+        }
+    }
 }
